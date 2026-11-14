@@ -1,0 +1,45 @@
+{
+  "provenance": {
+    "description": "Curated archived NASA CCMC DONKI observations, not lunar radiation forecasts. Wrapper fields are local metadata; sep preserves the matching API object unchanged.",
+    "retrievedOn": "2026-11-14",
+    "sepSourceUrl": "https://api.nasa.gov/DONKI/SEP?startDate=2024-05-11&endDate=2024-05-11&api_key=DEMO_KEY",
+    "sepRecordUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1",
+    "flareProvenance": "Flare ID confirmed by SEP linkedEvents. beginTime supplied in project specification. NASA FLR API returned HTTP 404; CCMC archive request timed out. No additional flare API fields claimed."
+  },
+  "sep": {
+    "sepID": "2024-05-11T04:07:00-SEP-001",
+    "eventTime": "2024-05-11T04:07Z",
+    "instruments": [
+      {
+        "displayName": "STEREO A: IMPACT 13-100 MeV"
+      }
+    ],
+    "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1",
+    "linkedEvents": [
+      {
+        "activityID": "2024-05-11T01:10:00-FLR-001"
+      },
+      {
+        "activityID": "2024-05-11T01:36:00-CME-001"
+      }
+    ],
+    "sentNotifications": [
+      {
+        "messageID": "20240511-AL-008",
+        "messageIssueTime": "2024-05-11T04:13Z",
+        "messageURL": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/30718/1"
+      },
+      {
+        "messageID": "20240511-AL-013",
+        "messageIssueTime": "2024-05-11T15:03Z",
+        "messageURL": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/30728/1"
+      }
+    ],
+    "submissionTime": "2024-05-11T04:13Z",
+    "versionId": 1
+  },
+  "flare": {
+    "flrID": "2024-05-11T01:10:00-FLR-001",
+    "beginTime": "2024-05-11T01:10:00Z"
+  }
+}

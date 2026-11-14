@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moonbase Blackout</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <main>
+    <h1>Moonbase Blackout</h1>
+    <p>Mission goal: keep the crew safe for 36 hours, shelter during the particle alert, and give the greenhouse at least 2 light periods.</p>
+
+    <!-- Briefing appears once. Retry returns straight to command. -->
+    <section id="briefing" aria-labelledby="briefing-title">
+      <h2 id="briefing-title">Radio briefing</h2>
+      <p>“Junior astronaut, our lunar outpost has lost power! Your battery holds 92 kWh. Make one choice every 6 hours for 6 turns. Every choice includes life support. Watch for the particle alert and get the crew into shelter.”</p>
+      <p>This is a fictional mission using archived May 2024 NASA observations. It is not a lunar radiation forecast.</p>
+      <button id="start" disabled>Take Command</button>
+    </section>
+    <p id="load-status" role="status">Loading mission data…</p>
+    <noscript>This game needs JavaScript enabled.</noscript>
+
+    <!-- Status and warning precede every action choice. -->
+    <section id="mission" hidden aria-labelledby="mission-title">
+      <h2 id="mission-title" tabindex="-1">May 2024 mission</h2>
+      <dl>
+        <div><dt>Turn</dt><dd id="turn"></dd></div>
+        <div><dt>Battery</dt><dd id="battery"></dd></div>
+        <div><dt>Crew</dt><dd id="crew"></dd></div>
+        <div><dt>Greenhouse</dt><dd id="greenhouse"></dd></div>
+      </dl>
+      <p id="warning" role="status" aria-live="assertive" aria-atomic="true"></p>
+      <div id="actions" aria-label="Choose one action for this turn">
+        <div><button data-action="conserve" aria-describedby="conserve-note">Conserve · 12 kWh</button><p id="conserve-note">Essential life support.</p></div>
+        <div><button data-action="greenhouse" aria-describedby="greenhouse-note greenhouse-reason">Greenhouse · 18 kWh total</button><p id="greenhouse-note">Life support plus 1 light period.</p><p id="greenhouse-reason"></p></div>
+        <div><button data-action="shelter" aria-describedby="shelter-note shelter-reason">Shelter · 18 kWh total</button><p id="shelter-note">Life support plus fictional 6 kWh ventilation. Protects this turn only.</p><p id="shelter-reason"></p></div>
+      </div>
+      <p id="feedback" role="status" aria-atomic="true"></p>
+      <section id="outcome" hidden aria-labelledby="outcome-title">
+        <h2 id="outcome-title" tabindex="-1"></h2>
+        <p id="debrief"></p>
+        <button id="retry">Retry</button>
+      </section>
+      <h3>Mission log</h3>
+      <ol id="log"></ol>
+    </section>
+
+    <!-- Keep observed source data distinct from game assumptions. -->
+    <section aria-labelledby="source-title">
+      <h2 id="source-title">Real observations, fictional mission</h2>
+      <p><a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">Archived NASA CCMC DONKI particle observation</a>: 2024-05-11T04:07:00Z. Linked flare: 2024-05-11T01:10:00-FLR-001, beginning 2024-05-11T01:10:00Z.</p>
+      <p id="timing">The flare time sets the fictional start 12 hours earlier. The particle observation sets the alert's 6-hour turn.</p>
+      <p>These are archived NASA observations, not lunar radiation forecasts. The blackout, clock offset, energy costs, light periods, and shelter protection are game assumptions. No live forecast is used.</p>
+    </section>
+  </main>
+</body>
+</html>

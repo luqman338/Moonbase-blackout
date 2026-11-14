@@ -1,0 +1,19 @@
+/* Simple, readable command panel. */
+:root { font-family: system-ui, sans-serif; color: #172332; background: #f3f5f7; line-height: 1.5; }
+body { margin: 0; }
+main { max-width: 850px; margin: auto; padding: 1.25rem; }
+section { margin: 1.5rem 0; padding: 1rem; border: 1px solid #a8b3bf; background: white; border-radius: .4rem; }
+h1, h2, h3 { line-height: 1.2; }
+a { color: #114c91; overflow-wrap: anywhere; }
+dl { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+dt { font-weight: 700; }
+dd { margin: .25rem 0; }
+#actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+#actions p { font-size: .95rem; margin: .5rem 0; }
+#warning { padding: .75rem; border: 2px solid #526273; }
+#warning.alert { background: #fff1c2; border-color: #775000; font-weight: 700; }
+/* Native buttons retain keyboard behavior and a clear focus ring. */
+button { font: inherit; padding: .75rem 1rem; min-height: 44px; border: 2px solid #183d69; border-radius: .3rem; color: white; background: #183d69; cursor: pointer; }
+button:disabled { color: #4b535c; background: #e2e6eb; border-color: #9ba5b1; cursor: default; }
+:focus-visible, h2:focus { outline: 3px solid #a34100; outline-offset: 4px; }
+[hidden] { display: none !important; }
