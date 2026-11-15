@@ -1,69 +1,76 @@
 # Moonbase Blackout
 
-A first playable educational game for ages 7–12. Manage a fictional lunar outpost for six 6-hour turns. Keep the crew safe, shelter on the particle-alert turn, and supply at least two greenhouse light periods. Starts with 92 kWh. No framework, build step, backend, or dependencies.
+An educational lunar mission for ages 7–12, created for NASA Space Apps Challenge 2026: **Build a Junior Astronaut Mission Trainer**. Plan across six six-hour shifts, protect the crew and supply two greenhouse light periods from a fictional 92 kWh battery.
 
-## Preview
+[Play the public demo](https://luqman338.github.io/Moonbase-blackout/) · [Challenge](https://www.spaceappschallenge.org/2026/challenges/junior-astronaut-mission-trainer/)
 
-From this repository, run:
+The public copy may lag this local checkout. This release audit does not deploy or submit the project. See [RELEASE_REPORT.md](./RELEASE_REPORT.md) for outstanding browser checks and release status.
+
+## How to play
+
+Begin Mission opens five manually advanced transmissions. Assume Command opens the console. Each shift, read the warning and choose one command:
+
+| Command | Total cost | Purpose |
+| --- | --- | --- |
+| Conserve | 12 kWh | Essential life support |
+| Greenhouse | 18 kWh | Life support and one light period |
+| Shelter | 18 kWh | Life support and protection for that shift only |
+
+Shelter when the particle alert appears. Earlier shelter does not cover a later shift. Costs appear before selection. Commands run through acknowledgement, operation and transmission, then wait for Continue. Skip Animation changes presentation only. Complete six shifts with safe crew and at least two light periods for full success. Retry resets the mission. The game uses visual feedback without audio. Behind the Mission explains the science, development, credits and privacy.
+
+## NASA data and assumptions
+
+[data/events.json](./data/events.json) preserves the retrieved NASA DONKI SEP object `2024-05-11T04:07:00-SEP-001`, recorded at `2024-05-11T04:07Z` by STEREO A: IMPACT 13-100 MeV. Sources: [CCMC record](https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1) and [dated API query](https://api.nasa.gov/DONKI/SEP?startDate=2024-05-11&endDate=2024-05-11&api_key=DEMO_KEY). The stored retrieval date is November 14, 2026. A fresh retrieval could not be completed during this release audit.
+
+The SEP links flare `2024-05-11T01:10:00-FLR-001`. Its begin time, `2024-05-11T01:10:00Z`, is a supplied specification fact, not an independently retrieved FLR response. Wrapper metadata and the flare subset are local curation.
+
+The fictional start is 12 hours before that supplied flare time: `2024-05-10T13:10:00Z`. The SEP observation follows 14 h 57 min later. `1 + floor(elapsed hours / 6)` places the warning before shift 3. No event timing was changed.
+
+The blackout, starting battery, energy costs, six-hour shifts and shelter protection are fictional. Shelter's extra 6 kWh represents fictional ventilation. Two light periods are a simplified objective, not a crop-growth model. Particles are a schematic visualization, not visible radiation. DONKI does not predict conditions or radiation dose at this fictional base. There are no live forecast calls.
+
+## Run and test
+
+No dependencies, framework, backend or build step. Serve the directory over HTTP:
 
 ```sh
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Open <http://127.0.0.1:8000/>. Use HTTP rather than opening `index.html` as a file so the browser can load local JSON. All application asset paths are relative and support a GitHub Pages repository prefix. A public copy is available at https://luqman338.github.io/Moonbase-blackout/. It may lag local changes. This documentation milestone does not deploy changes.
+Open http://127.0.0.1:8000/. Direct file opening cannot reliably load the JSON. Relative application asset paths support the GitHub Pages repository prefix.
 
-## Files
-
-| File | Purpose |
-| --- | --- |
-| `index.html` | Briefing, mission controls, debrief, and source explanation |
-| `styles.css` | Basic layout and keyboard focus |
-| `game.mjs` | Pure state transitions, timing, warnings, and debriefs |
-| `app.mjs` | Local JSON loading and DOM rendering |
-| `data/events.json` | Curated archive record and explicit provenance |
-| `game.test.mjs` | Dependency-free Node rule and warning checks |
-| `AGENTS.md` | Recurring project rules |
-
-## NASA provenance and game assumptions
-
-The local dataset uses archived May 2024 NASA CCMC DONKI observations, **not lunar radiation forecasts**. There are no live forecast calls during play.
-
-- Retrieved on November 14, 2026: the matching SEP object from the [NASA DONKI SEP API](https://api.nasa.gov/DONKI/SEP?startDate=2024-05-11&endDate=2024-05-11&api_key=DEMO_KEY). The object is preserved unchanged under `sep`, including available instrument, linked events, notification, submission, and version metadata. The wrapper and `provenance` fields are local curation metadata, not NASA API fields.
-- [SEP source record](https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1): `2024-05-11T04:07:00-SEP-001`. Its returned `eventTime` is `2024-05-11T04:07Z`, equivalent to `2024-05-11T04:07:00Z`. The source page was also retrieved, but its initial HTML did not contain the observation details.
-- The SEP's `linkedEvents` confirms flare ID `2024-05-11T01:10:00-FLR-001`. The flare `beginTime`, `2024-05-11T01:10:00Z`, comes from the verified facts supplied in the project specification. Independent flare retrieval failed: the NASA FLR API returned HTTP 404 and the CCMC web-service request timed out. No further flare metadata or source URL has been invented. The local `flare` object is a curated supplied-fact subset, not a retrieved API response.
-
-The simulation converts UTC timestamps to milliseconds. It subtracts 12 hours from flare beginTime to create the **fictional** scenario start, `2024-05-10T13:10:00Z`. The SEP event is 14 h 57 min later. `1 + Math.floor(elapsedMilliseconds / (6 * 60 * 60 * 1000))` gives turn 3. Its warning appears before the third choice.
-
-The blackout, clock offset, energy budget, 6-hour turns, greenhouse periods, and shelter effect are game assumptions. Conserve costs 12 kWh for essential life support. Greenhouse costs 18 kWh total and adds one light period. Shelter costs 18 kWh total, including fictional extra 6 kWh ventilation, and protects only its own turn.
-
-Before each turn, less than 12 kWh ends in power failure. On the alert turn, less than 18 kWh then ends in shelter power shortfall. A funded non-Shelter choice on that turn ends in missed shelter without spending energy. Other affordable moves spend energy and are logged. After six completed moves, a safe crew with at least two light periods wins. A safe crew with fewer periods earns partial success. There is no seventh-turn energy requirement. Terminal states block all actions. Retry resets May and skips the briefing.
-
-## Verification
-
-Requires Node.js 18 or newer for tests only:
+Node.js 18 or newer is needed only for tests:
 
 ```sh
 node --test game.test.mjs
 node --check game.mjs
 node --check app.mjs
+node --check mission-story.mjs
 ```
 
-All 11 tests passed during implementation. They cover all requested sequences/reset rules, exact timestamp conversion, warning state before turn 3, warning placement before controls, pre-turn power priority, unaffordable moves, turn-only shelter, and nonnegative battery across all six-turn action sequences.
+The audio-removal release run passed all 11 simulation tests. They cover outcomes, accounting, timing, pre-choice warning order, Retry, terminal conditions, nonnegative battery and input-state immutability. Browser checks for this release remain unverified. Earlier development checks are historical, not a substitute for checking this version.
 
-Manual browser check: Take Command, choose Conserve twice, confirm the particle warning appears before choosing turn 3, then Shelter, Greenhouse, Greenhouse, Conserve. Expect a full win with 2 kWh. Retry should immediately return to turn 1 with 92 kWh and no briefing. Tab through native buttons to check focus. An interactive browser playtest could not be performed in the implementation session because no browser connection was available. Automated warning checks cover simulation state and source order, not a live browser rendering.
+## Implementation
 
-## AI assistance
+- `game.mjs`: pure simulation, timestamp conversion and terminal rules.
+- `app.mjs`: DOM rendering, five-part intro, command phases, navigation and reports.
+- `index.html`, `styles.css`, `assets/favicon.svg`: interface, original SVG exterior and browser identity.
+- `mission-story.mjs`: public project story and editable credits. Everything in this file is publicly readable; never put private tester information here.
+- `data/events.json`: preserved archive record and explicit provenance.
 
-OpenAI Codex generated the initial implementation, tests, and documentation from the user's specification and retrieved the SEP archive record. Automated tests check game behavior. A human review and playtest are still useful before classroom use.
+Less than 12 kWh before a shift ends in power failure. On the alert shift, less than 18 kWh prevents shelter. A funded non-Shelter alert choice fails without spending energy. Six completed shifts end the mission without requiring a seventh shift's energy.
 
-## Behind the Mission
+## People and AI assistance
 
-The launch screen, command desk and report open the same terminal project story. Back returns to the originating screen without restarting or re-rendering the mission.
+Luqman led the concept, research, requirements, educational design, engineering trade-offs, gameplay, UI/UX, feedback collection, testing and iteration. Feedback from children in his community STEM, business and leadership program informed pacing, storytelling and interaction changes. No measured learning gains are claimed or child identities published.
 
-Edit narrative content, source links and private editorial fields in `mission-story.mjs`. Leave unknown fields empty: they do not appear in the UI. Confirm the project lead's public name, each registered member's name and specific contribution, and any media source/permission before adding credits. No external media files or audio are bundled now.
+Farhan, Luqman's father, supported the project as Advisor and Code Reviewer. ChatGPT assisted research, brainstorming, planning and review. Codex substantially assisted implementation, tests, documentation and debugging. The code is not presented as independently hand-written by Luqman.
 
-Sunday playtesting entries belong in `editorial.playtesting`. Record the task, age range, observed difficulty, change and retest without identifying children. Do not describe technical browser checks as child usability or learning evidence.
+## Privacy and licensing
 
-The original Verification paragraph above records the initial implementation session. Subsequent development included browser verification of all four outcomes, presentation phases, manual advancement, Retry cancellation, reduced motion, particle timing and 1440/390/320 layouts. The current documentation pass also checks launch/gameplay/report navigation to the shared story and back. These checks do not establish educational effectiveness.
+The game has no accounts, forms, analytics, advertising, cookies or gameplay reporting. The game does not save preferences or mission progress in local storage. GitHub Pages hosts the public site and [logs visitor IP addresses for security](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection). External links have their own privacy practices.
 
-Scientific caveat: the SEP object is retrieved NASA data; the flare beginTime remains a supplied specification fact whose independent retrieval was not completed. Early research and qualitative prototype assessments in the story come from the project lead's notes. Commit IDs document implementation checkpoints, not independent proof of that research or learner impact.
+Original project materials are offered under the complete [Apache License 2.0](./LICENSE), with attribution in [NOTICE](./NOTICE). NASA records retain separate terms. No third-party audio is included. See [ASSET_CREDITS.md](./ASSET_CREDITS.md). Apache does not require prominent UI attribution or grant rights the project does not own.
+
+## Known limitations
+
+This independent educational game is not an official NASA product or real mission-planning software. It does not model radiation dose, shielding, crop physiology, thermal behaviour or real life-support demand. Screen-reader, touch and final responsive browser checks remain necessary. All third-party audio has been removed, resolving the previous audio-provenance release blocker. This does not certify overall submission eligibility.

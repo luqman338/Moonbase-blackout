@@ -499,6 +499,7 @@ for (const [index, section] of storySections.entries()) {
   const article = document.createElement('section');
   article.id = `story-${section.id}`;
   const heading = document.createElement('h3');
+  heading.tabIndex = -1;
   heading.textContent = `${String(index + 1).padStart(2, '0')} / ${section.title}`;
   article.append(heading);
   const body = document.createElement('div');
@@ -513,6 +514,7 @@ for (const [index, section] of storySections.entries()) {
   link.addEventListener('click', event => {
     event.preventDefault();
     article.scrollIntoView({ block: 'start' });
+    heading.focus({ preventScroll: true });
   });
   item.append(link); contents.append(item);
 }

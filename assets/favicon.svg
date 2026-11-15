@@ -1,0 +1,7 @@
+<!-- Original Moonbase Blackout mark: a moon above a lit outpost window. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#10171d"/>
+  <circle cx="40" cy="20" r="11" fill="#b5c2c8"/>
+  <path d="M11 49V34l16-9 17 9v15" fill="#20251f" stroke="#9aef8c" stroke-width="3"/>
+  <path d="M23 49V37h10v12M8 50h48" fill="none" stroke="#9aef8c" stroke-width="3"/>
+</svg>
