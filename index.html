@@ -8,64 +8,116 @@
   <link rel="stylesheet" href="./styles.css">
   <script type="module" src="./app.mjs"></script>
 </head>
-<body>
+<body data-screen="launch">
   <a class="skip-link" href="#command">Skip to mission controls</a>
   <main>
-    <header class="masthead">
+    <header id="masthead" class="masthead">
       <a class="wordmark" href="./"><span class="mission-mark" aria-hidden="true">◒</span> MOONBASE <span>BLACKOUT</span></a>
       <span class="archive-label">MAY 2024 <span class="separator">/</span> ARCHIVE MISSION</span>
     </header>
 
-    <!-- Original CSS illustration. Scene changes reflect recorded choices, never a live feed. -->
-    <section id="scene" class="scene" aria-label="Illustrated lunar outpost">
-      <div class="stars" aria-hidden="true"></div><div class="earth" aria-hidden="true"></div>
-      <div class="ridge ridge-back" aria-hidden="true"></div><div class="ridge ridge-front" aria-hidden="true"></div>
-      <div class="surface" aria-hidden="true"></div>
-      <div class="scene-caption"><span class="eyebrow">LUNAR SURFACE / FICTIONAL OUTPOST</span><h1>Moonbase Blackout</h1><p id="scene-story">A quiet outpost. One shared battery. You’re in command.</p></div>
-      <div class="outpost" aria-hidden="true">
-        <div class="antenna"><i></i></div><div class="solar solar-one"></div><div class="solar solar-two"></div>
-        <div class="connector"></div><div class="habitat"><div class="habitat-roof"></div><span class="window"></span><span class="window"></span><span class="hatch"></span><b>01 / HAB</b></div>
-        <div class="shelter-building"><span></span><b>SHELTER</b></div>
-        <div class="greenhouse-building"><i></i><i></i><i></i><span></span></div>
-        <div class="ground-track"></div>
-      </div>
-      <div class="scene-bottom"><span>OUTPOST 01 <span class="separator">/</span> 36-HOUR BLACKOUT</span><span id="scene-status">Essential lights online</span></div>
+    <!-- Original SVG: all module depth follows the same (40, -26) projection. -->
+    <section id="scene" class="scene" aria-label="Lunar outpost exterior">
+      <svg class="scene-art" viewBox="0 0 1440 460" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#080e18"/><stop offset="1" stop-color="#26323f"/></linearGradient>
+          <linearGradient id="soil" x2="0.3" y2="1"><stop stop-color="#78818a"/><stop offset="1" stop-color="#343f49"/></linearGradient>
+          <linearGradient id="shell" x2="0" y2="1"><stop stop-color="#d2d1c5"/><stop offset=".3" stop-color="#a1aaa9"/><stop offset="1" stop-color="#66747b"/></linearGradient>
+          <linearGradient id="glass" x2="0" y2="1"><stop stop-color="#78989a" stop-opacity=".6"/><stop offset="1" stop-color="#263d43"/></linearGradient>
+          <radialGradient id="earth-color"><stop stop-color="#a8c4cc"/><stop offset=".5" stop-color="#588396"/><stop offset="1" stop-color="#1b3047"/></radialGradient>
+          <pattern id="cells" width="23" height="14" patternUnits="userSpaceOnUse" patternTransform="matrix(1 0 -1.538461 1 0 0)"><rect width="23" height="14" fill="#243e56"/><path d="M0 0H23V14" fill="none" stroke="#7d92a2" stroke-width="1"/></pattern>
+        </defs>
+        <rect width="1440" height="460" fill="url(#sky)"/>
+        <g fill="#c6d2da" opacity=".65"><circle cx="170" cy="65" r="1"/><circle cx="460" cy="110" r="1"/><circle cx="832" cy="49" r="1"/><circle cx="1010" cy="102" r="1"/><circle cx="1340" cy="60" r="1"/></g>
+        <g transform="translate(1200 140)"><circle r="21" fill="url(#earth-color)"/><path d="M-14-10Q-2-19 6-9L1-1 10 8-1 14-5 1-14-2Z" fill="#b8c6c1" opacity=".65"/><path d="M3-21A21 21 0 0 1 3 21Q19 0 3-21" fill="#0a1523" opacity=".75"/></g>
+        <path d="M0 225 96 214 203 231 323 182 407 198 513 225 646 210 773 225 896 186 973 161 1038 188 1164 214 1280 192 1440 210V460H0Z" fill="#465360"/>
+        <path d="m0 246 205-15 120-49-59 61 187-13 61-5 136 19 123-19 123-39 77-25-33 48 98 13 126-8 116-22 160 18v250H0Z" fill="#68747e"/>
+        <path d="M0 267Q315 240 650 264T1440 251V460H0Z" fill="url(#soil)"/>
+        <g fill="#25313a" opacity=".38"><ellipse cx="128" cy="362" rx="76" ry="12"/><ellipse cx="1300" cy="397" rx="50" ry="8"/><ellipse cx="802" cy="417" rx="95" ry="10"/></g>
+        <g fill="none" stroke="#9ca4a7" opacity=".22"><path d="M0 315Q130 291 260 310M1010 388Q1160 370 1440 383M240 425Q340 402 491 414"/></g>
+        <!-- Shadows share the upper-left light source. No radiation damage is depicted. -->
+        <g fill="#18242c" opacity=".5"><path d="m292 347 128 0 62 22-140 8Z"/><path d="m490 342 250 0 82 31-258 0Z"/><path d="m860 342 185 0 72 27-193 0Z"/><path d="m1090 332 170 0 59 17-169 2Z"/></g>
+        <!-- Enclosed passages attach to module sides, behind their front walls. -->
+        <g stroke="#56646b" stroke-width="2"><path d="m405 295 40-26h64v32h-104Z" fill="#939e9e"/><path d="M405 295H509V321H405Z" fill="#626f76"/><path d="M422 296V321M439 296V321M456 296V321M473 296V321"/>
+          <path d="m733 284 40-26h100v33H733Z" fill="#a5adab"/><path d="M733 284H873V314H733Z" fill="#6e7b80"/><path d="M755 285V314M780 285V314M805 285V314M830 285V314M855 285V314"/></g>
+        <g id="shelter-module">
+          <path d="m290 281 40-26h130l-40 26Z" fill="#a4aaa5"/><path d="m420 281 40-26v66l-40 26Z" fill="#56636b"/><rect x="290" y="281" width="130" height="66" rx="3" fill="#7a8589" stroke="#bac0b7"/>
+          <path d="M281 348 273 309 287 283 299 277 301 329 410 329 422 281 431 298 440 345Z" fill="#657078"/>
+          <rect x="335" y="297" width="35" height="43" rx="7" fill="#34434d" stroke="#b4bcb6" stroke-width="3"/><rect class="shelter-lamp" x="342" y="303" width="21" height="5" rx="1"/>
+          <text x="306" y="291" class="module-label">SHELTER</text>
+        </g>
+        <g id="habitat-module">
+          <path d="m490 238 40-26h250l-40 26Z" fill="#d3d4c9" stroke="#a5b0b0"/><path d="m740 238 40-26v104l-40 26Z" fill="#556570" stroke="#8c9c9e"/><rect x="490" y="238" width="250" height="104" rx="5" fill="url(#shell)" stroke="#c1c6bf" stroke-width="2"/>
+          <path d="M508 239V340M574 239V340M640 239V340M721 239V340" fill="none" stroke="#697b83" stroke-width="3"/>
+          <path d="m505 343-1 9h21v-9m174 0v9h22l-1-9" fill="#2c3942"/>
+          <g fill="#283943" stroke="#4c616d" stroke-width="4"><rect x="524" y="261" width="35" height="24" rx="5"/><rect x="591" y="261" width="35" height="24" rx="5"/></g>
+          <g class="habitat-windows"><rect x="528" y="265" width="27" height="16" rx="2"/><rect x="595" y="265" width="27" height="16" rx="2"/></g>
+          <rect x="663" y="273" width="39" height="62" rx="12" fill="#3b4e59" stroke="#c0c9c5" stroke-width="3"/><path d="M683 284V323M675 304H691" stroke="#8d9d9e" fill="none"/>
+          <path d="M525 212V181m-17 0h34l-7 10h-20Z" fill="#bac5c1" stroke="#a3afae" stroke-width="2"/>
+          <rect class="warning-lamp" x="703" y="232" width="13" height="7" rx="2"/>
+          <text x="523" y="316" class="module-label">OUTPOST 01 / HABITAT</text>
+        </g>
+        <g id="greenhouse-module">
+          <path d="M860 278Q860 246 892 246H1013Q1045 246 1045 278L1085 252Q1085 220 1053 220H932Q900 220 900 252Z" fill="#6e868a" stroke="#9dafac"/><path d="M1045 278 1085 252V316L1045 342Z" fill="#3d535b" stroke="#8a9f9f"/><path d="m893 246 40-26m-1 26 40-26m-1 26 40-26" stroke="#a2b3ae" stroke-width="2"/>
+          <path class="greenhouse-glass" d="M860 342V278Q860 246 892 246H1013Q1045 246 1045 278V342Z" fill="url(#glass)"/>
+          <path class="grow-light" d="M874 266H1032" stroke-width="5"/>
+          <g class="crops" fill="#879b79" stroke="#6d8870" stroke-width="3"><path d="M884 331V308m0 10q-15-15-17-3 4 7 17 6m0-7q15-15 17-3-5 7-17 7M923 331V308m0 10q-15-15-17-3 4 7 17 6m0-7q15-15 17-3-5 7-17 7M963 331V308m0 10q-15-15-17-3 4 7 17 6m0-7q15-15 17-3-5 7-17 7M1002 331V308m0 10q-15-15-17-3 4 7 17 6m0-7q15-15 17-3-5 7-17 7"/></g>
+          <path d="M860 342V278Q860 246 892 246H1013Q1045 246 1045 278V342ZM893 247V341M932 247V341M971 247V341M1010 247V341M861 292H1044" fill="none" stroke="#b0bcb6" stroke-width="3"/>
+          <rect x="859" y="332" width="187" height="12" rx="2" fill="#677c7d"/><text x="915" y="341" class="module-label">GREENHOUSE</text>
+        </g>
+        <!-- A buried service cable reaches the fixed solar-array support, not the glass. -->
+        <path d="M780 321V356H1144V329" fill="none" stroke="#56616a" stroke-width="3"/>
+        <g id="solar-array"><path d="M1120 321V336M1246 299V314" stroke="#a0acab" stroke-width="5"/><path d="m1085 322 60-39h175l-60 39Z" fill="url(#cells)" stroke="#b2bfbd" stroke-width="3"/><path d="m1085 322 175 0v5h-175Z" fill="#425667"/><text x="1150" y="349" class="terrain-label">SOLAR ARRAY / OFFLINE</text></g>
+        <g fill="#64717a" stroke="#849097"><path d="m185 338 13-8 16 7 3 9-27 1Z"/><path d="m1180 407 8-6 12 2 5 9-22 1Z"/><path d="m80 419 8-4 9 2 4 6-20 2Z"/></g>
+      </svg>
+      <div class="scene-caption"><span class="eyebrow">LUNAR SURFACE / FICTIONAL OUTPOST</span><h1>Moonbase Blackout</h1><p id="scene-story">The solar panels are down. Keep your crew alive until power returns.</p><button id="start" class="primary launch-button" disabled>Begin Mission <span aria-hidden="true">↗</span></button></div>
+      <div class="scene-bottom"><span>OUTPOST 01 <span class="separator">/</span> 36-HOUR BLACKOUT</span><span id="scene-status">Life support online</span></div>
     </section>
 
-    <div id="command" class="command-deck" tabindex="-1">
-      <section id="briefing" class="briefing" aria-labelledby="briefing-title">
-        <div><p class="eyebrow">INCOMING / YOUR FIRST COMMAND</p><h2 id="briefing-title">Keep the crew safe. Help the plants grow.</h2><p>You have <strong>92 kWh</strong> for <strong>36 hours</strong>. Choose once every 6 hours, for six turns. Everything uses the same battery, including life support.</p></div>
-        <div class="briefing-rules"><p><span>01</span> Give the greenhouse at least <strong>2 light periods</strong>.</p><p><span>02</span> When the particle alert appears, choose <strong>Shelter</strong>. It protects the crew for <strong>that turn only</strong>.</p><div class="briefing-buttons"><button id="start" class="primary" disabled>Take Command <span aria-hidden="true">↗</span></button><button id="skip" class="quiet" disabled>Skip briefing</button></div></div>
-      </section>
-      <p id="load-status" role="status">Loading mission data…</p>
-      <noscript>This game needs JavaScript enabled.</noscript>
+    <!-- Briefing is a separate screen. Reviewing it never advances or resets a run. -->
+    <section id="briefing" class="transmission" hidden aria-labelledby="transmission-title">
+      <header class="transmission-header"><span>OUTPOST 01 / COMMAND LINK</span><span id="transmission-id">MB-01</span></header>
+      <div id="transmission-body" class="transmission-body" tabindex="0" role="region" aria-label="Transmission text"><div class="transmission-copy">
+        <p class="eyebrow">INCOMING TRANSMISSION <span id="transmission-count">01/05</span></p>
+        <h2 id="transmission-title" tabindex="-1" aria-describedby="transmission-readable">Command transfer</h2>
+        <!-- Assistive technology gets complete sentences, never character-by-character updates. -->
+        <p id="transmission-readable" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+        <p class="transmission-message" aria-hidden="true"><span id="transmission-text"></span><span id="transmission-cursor" class="transmission-cursor"></span></p>
+      </div>
+      </div><footer class="transmission-controls"><button id="skip" class="quiet">Skip Intro</button><button id="next-transmission" class="transmission-next">Next Transmission <span aria-hidden="true">→</span></button></footer>
+    </section>
 
+    <p id="load-status" role="status">Loading mission data…</p>
+    <noscript>This game needs JavaScript enabled.</noscript>
+    <div id="command" class="command-deck" tabindex="-1" hidden>
       <section id="mission" hidden aria-labelledby="mission-title">
-        <div class="mission-heading"><div><p class="eyebrow">MISSION CONTROL</p><h2 id="mission-title" tabindex="-1">Your next six hours</h2></div><p id="turn"></p></div>
-        <ol id="timeline" class="timeline" aria-label="Six-turn mission timeline"></ol>
+        <div class="mission-heading"><div><p class="eyebrow">OUTPOST 01 / OPERATIONS</p><h2 id="mission-title" tabindex="-1">Your next six hours</h2></div><div class="mission-tools"><p id="turn"></p><button id="review-briefing" class="quiet">Mission Briefing</button></div></div>
+
         <dl class="dashboard">
           <div class="battery-card"><dt>Shared battery <span id="battery-percent"></span></dt><dd id="battery"></dd><div id="battery-meter" class="battery-meter" role="progressbar" aria-label="Battery remaining" aria-valuemin="0" aria-valuemax="92"><span id="battery-fill"></span></div></div>
           <div><dt>Crew / shelter</dt><dd id="crew"></dd><p id="shelter-status"></p></div>
           <div><dt>Greenhouse</dt><dd id="greenhouse"></dd><p id="plant-status"></p></div>
         </dl>
+        <ol id="timeline" class="timeline" aria-label="Six-shift mission timeline"></ol>
+        <div id="shift-response" class="shift-response" hidden><p id="shift-status" role="status" aria-atomic="true"></p><button id="skip-shift" class="quiet">Skip transition</button></div>
         <div class="control-grid">
           <section class="decision-panel" aria-labelledby="decision-title">
-            <div class="section-heading"><h3 id="decision-title">Choose your next move</h3><span>ONE CHOICE / 6 HOURS</span></div>
+            <div class="section-heading"><h3 id="decision-title">Choose your next move</h3><span>ONE COMMAND / 6 HOURS</span></div>
             <!-- Warning is announced and rendered above choices before they are enabled. -->
             <div class="warning-panel"><p id="warning" tabindex="-1" role="status" aria-live="assertive" aria-atomic="true"></p><p id="alert-source" hidden>Based on the archived NASA particle observation, 11 May 2024 at 04:07 UTC. This is a game alert, not a live forecast.</p></div>
             <div id="actions" aria-label="Choose one action for this turn">
-              <div><button data-action="conserve" aria-describedby="conserve-note conserve-reason"><span class="action-number">01 / ESSENTIALS</span><span class="action-name">Conserve</span><span class="action-cost"></span></button><p id="conserve-note">Life support only. Save energy for later.</p><p id="conserve-reason" class="action-reason"></p></div>
-              <div><button data-action="greenhouse" aria-describedby="greenhouse-note greenhouse-reason"><span class="action-number">02 / GROW</span><span class="action-name">Greenhouse</span><span class="action-cost"></span></button><p id="greenhouse-note">Life support + 1 light period.</p><p id="greenhouse-reason" class="action-reason"></p></div>
-              <div><button data-action="shelter" aria-describedby="shelter-note shelter-reason"><span class="action-number">03 / PROTECT</span><span class="action-name">Shelter</span><span class="action-cost"></span></button><p id="shelter-note">Life support + shelter ventilation. Protects this turn only.</p><p id="shelter-reason" class="action-reason"></p></div>
+              <div><button data-action="conserve" aria-describedby="conserve-note conserve-reason"><span class="action-number">01 / LIFE SUPPORT</span><span class="action-name">Conserve</span><span class="action-cost"></span></button><p id="conserve-note">Life support only. Save energy for later.</p><p id="conserve-reason" class="action-reason"></p></div>
+              <div><button data-action="greenhouse" aria-describedby="greenhouse-note greenhouse-reason"><span class="action-number">02 / GROW LIGHTS</span><span class="action-name">Greenhouse</span><span class="action-cost"></span></button><p id="greenhouse-note">Life support + 1 light period.</p><p id="greenhouse-reason" class="action-reason"></p></div>
+              <div><button data-action="shelter" aria-describedby="shelter-note shelter-reason"><span class="action-number">03 / CREW SHELTER</span><span class="action-name">Shelter</span><span class="action-cost"></span></button><p id="shelter-note">Life support + shelter ventilation. Protects this turn only.</p><p id="shelter-reason" class="action-reason"></p></div>
             </div>
-            <p id="energy-plan" class="energy-plan"></p>
+            <details class="planning"><summary>Energy plan</summary><p id="energy-plan" class="energy-plan"></p></details>
           </section>
           <section class="radio-panel" aria-labelledby="radio-title"><div class="section-heading"><h3 id="radio-title"><span aria-hidden="true">◉</span> Crew radio</h3><span>OUTPOST 01</span></div><div class="radio-message" role="status" aria-atomic="true"><p id="radio-label" class="eyebrow">COMMAND LINK OPEN</p><p id="feedback"></p><p id="radio-next"></p></div><details class="mission-log"><summary>Decision log <span id="log-count">0 / 6</span></summary><ol id="log"></ol></details></section>
         </div>
         <section id="outcome" class="outcome" hidden aria-labelledby="outcome-title"><p class="eyebrow">MISSION DEBRIEF</p><h2 id="outcome-title" tabindex="-1"></h2><p id="debrief"></p><p id="result-stats"></p><button id="retry" class="primary">Retry <span aria-hidden="true">↗</span></button></section>
       </section>
     </div>
-    <footer class="source-footer"><p><span class="eyebrow">SCIENCE IN THE SIGNAL</span> Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><details><summary>Source & game assumptions</summary><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details></footer>
+    <footer id="source-footer" class="source-footer"><p><span class="eyebrow">SCIENCE IN THE SIGNAL</span> Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><details><summary>Source & game assumptions</summary><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details></footer>
   </main>
 </body>
 </html>
