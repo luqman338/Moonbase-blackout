@@ -11,13 +11,30 @@
 <body data-screen="launch">
   <a class="skip-link" href="#command">Skip to mission controls</a>
   <main>
-    <header id="masthead" class="masthead">
+    <!-- Launch and briefing share a terminal housing, separate from the gameplay scene. -->
+    <section id="launch" class="terminal-screen launch-station" aria-labelledby="launch-title">
+      <div class="terminal-housing">
+        <header class="station-plate"><span>OUTPOST 01 / LUNAR OPERATIONS</span><span>MAY 2024</span></header>
+        <div class="terminal-monitor launch-monitor">
+          <div class="terminal-label">MISSION / 01</div>
+          <div class="launch-copy">
+            <h1 id="launch-title">Moonbase Blackout</h1>
+            <p class="launch-provenance">Fictional mission.<br>Based on archived observations.</p>
+            <button id="start" class="terminal-button launch-button" disabled><span aria-hidden="true">&gt;</span> Begin Mission<span class="terminal-cursor" aria-hidden="true"></span></button>
+            <p id="load-status" role="status">Loading mission data…</p>
+            <noscript>This game needs JavaScript enabled.</noscript>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <header id="masthead" class="masthead" hidden>
       <a class="wordmark" href="./"><span class="mission-mark" aria-hidden="true">◒</span> MOONBASE <span>BLACKOUT</span></a>
       <span class="archive-label">MAY 2024 <span class="separator">/</span> ARCHIVE MISSION</span>
     </header>
 
     <!-- Original SVG: all module depth follows the same (40, -26) projection. -->
-    <section id="scene" class="scene" aria-label="Lunar outpost exterior">
+    <section id="scene" class="scene" aria-label="Lunar outpost exterior" hidden>
       <svg class="scene-art" viewBox="0 0 1440 460" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#080e18"/><stop offset="1" stop-color="#26323f"/></linearGradient>
@@ -70,54 +87,94 @@
         <g id="solar-array"><path d="M1120 321V336M1246 299V314" stroke="#a0acab" stroke-width="5"/><path d="m1085 322 60-39h175l-60 39Z" fill="url(#cells)" stroke="#b2bfbd" stroke-width="3"/><path d="m1085 322 175 0v5h-175Z" fill="#425667"/><text x="1150" y="349" class="terrain-label">SOLAR ARRAY / OFFLINE</text></g>
         <g fill="#64717a" stroke="#849097"><path d="m185 338 13-8 16 7 3 9-27 1Z"/><path d="m1180 407 8-6 12 2 5 9-22 1Z"/><path d="m80 419 8-4 9 2 4 6-20 2Z"/></g>
       </svg>
-      <div class="scene-caption"><span class="eyebrow">LUNAR SURFACE / FICTIONAL OUTPOST</span><h1>Moonbase Blackout</h1><p id="scene-story">The solar panels are down. Keep your crew alive until power returns.</p><button id="start" class="primary launch-button" disabled>Begin Mission <span aria-hidden="true">↗</span></button></div>
+      <div class="scene-caption"><span class="eyebrow">LUNAR SURFACE / FICTIONAL OUTPOST</span><h1>Moonbase Blackout</h1><p id="scene-story">The solar panels are down. Keep your crew alive until power returns.</p></div>
       <div class="scene-bottom"><span>OUTPOST 01 <span class="separator">/</span> 36-HOUR BLACKOUT</span><span id="scene-status">Life support online</span></div>
     </section>
 
     <!-- Briefing is a separate screen. Reviewing it never advances or resets a run. -->
-    <section id="briefing" class="transmission" hidden aria-labelledby="transmission-title">
-      <header class="transmission-header"><span>OUTPOST 01 / COMMAND LINK</span><span id="transmission-id">MB-01</span></header>
-      <div id="transmission-body" class="transmission-body" tabindex="0" role="region" aria-label="Transmission text"><div class="transmission-copy">
-        <p class="eyebrow">INCOMING TRANSMISSION <span id="transmission-count">01/05</span></p>
-        <h2 id="transmission-title" tabindex="-1" aria-describedby="transmission-readable">Command transfer</h2>
-        <!-- Assistive technology gets complete sentences, never character-by-character updates. -->
-        <p id="transmission-readable" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
-        <p class="transmission-message" aria-hidden="true"><span id="transmission-text"></span><span id="transmission-cursor" class="transmission-cursor"></span></p>
+    <section id="briefing" class="terminal-screen transmission" hidden aria-labelledby="transmission-title">
+      <div class="terminal-housing">
+        <header class="station-plate"><span>OUTPOST 01 / COMMAND LINK</span><span>MOONBASE BLACKOUT</span></header>
+        <div class="terminal-monitor transmission-monitor">
+          <header class="transmission-header"><span id="transmission-id">MB-01 / COMMAND TRANSFER</span><span id="transmission-count">01/05</span></header>
+          <div id="transmission-body" class="transmission-body" tabindex="0" role="region" aria-label="Transmission text. Press Enter or Space to complete incoming text."><div class="transmission-copy">
+            <p class="terminal-label">INCOMING TRANSMISSION</p>
+            <h2 id="transmission-title" tabindex="-1" aria-describedby="transmission-readable">Command transfer</h2>
+            <!-- Assistive technology gets complete sentences, never character-by-character updates. -->
+            <p id="transmission-readable" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+            <p class="transmission-message" aria-hidden="true"><span id="transmission-text"></span><span id="transmission-cursor" class="terminal-cursor"></span></p>
+          </div></div>
+          <footer class="transmission-controls"><button id="skip" class="terminal-button terminal-skip">Skip Intro</button><button id="next-transmission" class="terminal-button transmission-next">Next Transmission <span aria-hidden="true">&gt;</span></button></footer>
+        </div>
       </div>
-      </div><footer class="transmission-controls"><button id="skip" class="quiet">Skip Intro</button><button id="next-transmission" class="transmission-next">Next Transmission <span aria-hidden="true">→</span></button></footer>
     </section>
 
-    <p id="load-status" role="status">Loading mission data…</p>
-    <noscript>This game needs JavaScript enabled.</noscript>
     <div id="command" class="command-deck" tabindex="-1" hidden>
       <section id="mission" hidden aria-labelledby="mission-title">
-        <div class="mission-heading"><div><p class="eyebrow">OUTPOST 01 / OPERATIONS</p><h2 id="mission-title" tabindex="-1">Your next six hours</h2></div><div class="mission-tools"><p id="turn"></p><button id="review-briefing" class="quiet">Mission Briefing</button></div></div>
-
-        <dl class="dashboard">
-          <div class="battery-card"><dt>Shared battery <span id="battery-percent"></span></dt><dd id="battery"></dd><div id="battery-meter" class="battery-meter" role="progressbar" aria-label="Battery remaining" aria-valuemin="0" aria-valuemax="92"><span id="battery-fill"></span></div></div>
-          <div><dt>Crew / shelter</dt><dd id="crew"></dd><p id="shelter-status"></p></div>
-          <div><dt>Greenhouse</dt><dd id="greenhouse"></dd><p id="plant-status"></p></div>
-        </dl>
+        <header class="console-strip">
+          <div class="console-identification"><span class="engraved">OUTPOST 01</span><h2 id="mission-title" tabindex="-1">Lunar operations</h2></div>
+          <p id="turn"></p>
+        </header>
         <ol id="timeline" class="timeline" aria-label="Six-shift mission timeline"></ol>
-        <div id="shift-response" class="shift-response" hidden><p id="shift-status" role="status" aria-atomic="true"></p><button id="skip-shift" class="quiet">Skip transition</button></div>
-        <div class="control-grid">
-          <section class="decision-panel" aria-labelledby="decision-title">
-            <div class="section-heading"><h3 id="decision-title">Choose your next move</h3><span>ONE COMMAND / 6 HOURS</span></div>
-            <!-- Warning is announced and rendered above choices before they are enabled. -->
-            <div class="warning-panel"><p id="warning" tabindex="-1" role="status" aria-live="assertive" aria-atomic="true"></p><p id="alert-source" hidden>Based on the archived NASA particle observation, 11 May 2024 at 04:07 UTC. This is a game alert, not a live forecast.</p></div>
-            <div id="actions" aria-label="Choose one action for this turn">
-              <div><button data-action="conserve" aria-describedby="conserve-note conserve-reason"><span class="action-number">01 / LIFE SUPPORT</span><span class="action-name">Conserve</span><span class="action-cost"></span></button><p id="conserve-note">Life support only. Save energy for later.</p><p id="conserve-reason" class="action-reason"></p></div>
-              <div><button data-action="greenhouse" aria-describedby="greenhouse-note greenhouse-reason"><span class="action-number">02 / GROW LIGHTS</span><span class="action-name">Greenhouse</span><span class="action-cost"></span></button><p id="greenhouse-note">Life support + 1 light period.</p><p id="greenhouse-reason" class="action-reason"></p></div>
-              <div><button data-action="shelter" aria-describedby="shelter-note shelter-reason"><span class="action-number">03 / CREW SHELTER</span><span class="action-name">Shelter</span><span class="action-cost"></span></button><p id="shelter-note">Life support + shelter ventilation. Protects this turn only.</p><p id="shelter-reason" class="action-reason"></p></div>
-            </div>
-            <details class="planning"><summary>Energy plan</summary><p id="energy-plan" class="energy-plan"></p></details>
+
+        <!-- Shared instrument tray. The monitor precedes every command in reading order. -->
+        <div class="console-instruments">
+          <section class="battery-bay instrument-bay" aria-labelledby="battery-title">
+            <h3 id="battery-title" class="instrument-label">SHARED BATTERY</h3>
+            <p id="battery" class="instrument-value"></p>
+            <div id="battery-meter" class="battery-meter" role="progressbar" aria-label="Battery remaining" aria-valuemin="0" aria-valuemax="92"><span id="battery-fill"></span></div>
+            <div class="battery-scale"><span>0</span><span id="battery-percent"></span><span>92 kWh</span></div>
+            <p class="instrument-note">No recharge during mission</p>
           </section>
-          <section class="radio-panel" aria-labelledby="radio-title"><div class="section-heading"><h3 id="radio-title"><span aria-hidden="true">◉</span> Crew radio</h3><span>OUTPOST 01</span></div><div class="radio-message" role="status" aria-atomic="true"><p id="radio-label" class="eyebrow">COMMAND LINK OPEN</p><p id="feedback"></p><p id="radio-next"></p></div><details class="mission-log"><summary>Decision log <span id="log-count">0 / 6</span></summary><ol id="log"></ol></details></section>
+
+          <section class="operations-monitor" aria-labelledby="readout-title">
+            <header class="monitor-header"><h3 id="readout-title">TRANSMISSION / READOUT</h3><span id="monitor-phase"></span></header>
+            <div class="monitor-copy">
+              <!-- Alerts render immediately, before commands are enabled. Only results are typed. -->
+              <p id="warning" tabindex="-1" role="status" aria-live="assertive" aria-atomic="true"></p>
+              <p id="alert-source" hidden>Game alert from the NASA archive: 11 May 2024, 04:07 UTC. Not a live forecast.</p>
+              <div id="previous-report" hidden>
+                <p id="report-label" class="monitor-label"></p>
+                <p id="feedback-readable" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+                <p class="monitor-result" aria-hidden="true"><span id="feedback"></span><span id="monitor-cursor" class="terminal-cursor" hidden></span></p>
+              </div>
+              <p id="decision-fact"></p>
+              <div id="shift-response" hidden><button id="skip-shift" class="monitor-key">Skip transition</button></div>
+              <section id="outcome" class="outcome" hidden aria-labelledby="outcome-title">
+                <h3 id="outcome-title" tabindex="-1"></h3><p id="debrief"></p><p id="result-stats"></p>
+              </section>
+            </div>
+          </section>
+
+          <div class="status-bay">
+            <section class="instrument-bay crew-bay" aria-labelledby="crew-title">
+              <h3 id="crew-title" class="instrument-label">CREW PROTECTION</h3>
+              <p id="crew" class="instrument-value"></p><p id="shelter-status" class="instrument-note"></p>
+            </section>
+            <section class="instrument-bay greenhouse-bay" aria-labelledby="greenhouse-title">
+              <h3 id="greenhouse-title" class="instrument-label">GREENHOUSE / LIGHT PERIODS</h3>
+              <p id="greenhouse" class="instrument-value"></p>
+              <div class="light-periods" aria-hidden="true"><span></span><span></span></div>
+              <p id="plant-status" class="instrument-note"></p><p id="light-status" class="instrument-note"></p>
+            </section>
+          </div>
         </div>
-        <section id="outcome" class="outcome" hidden aria-labelledby="outcome-title"><p class="eyebrow">MISSION DEBRIEF</p><h2 id="outcome-title" tabindex="-1"></h2><p id="debrief"></p><p id="result-stats"></p><button id="retry" class="primary">Retry <span aria-hidden="true">↗</span></button></section>
+
+        <section class="command-bank" aria-labelledby="decision-title">
+          <div class="bank-label"><h3 id="decision-title" class="engraved">SHIFT COMMAND</h3><span>ONE COMMAND / SIX HOURS / COSTS INCLUDE LIFE SUPPORT</span></div>
+          <div id="actions" aria-label="Choose one action for this shift">
+            <div class="command-socket"><button data-action="conserve" aria-describedby="conserve-note conserve-reason"><span class="action-number">01 / LIFE SUPPORT</span><span class="action-name">Conserve</span><span class="action-cost"></span></button><p id="conserve-note">Life support only.</p><p id="conserve-reason" class="action-reason"></p></div>
+            <div class="command-socket"><button data-action="greenhouse" aria-describedby="greenhouse-note greenhouse-reason"><span class="action-number">02 / GROW LIGHTS</span><span class="action-name">Greenhouse</span><span class="action-cost"></span></button><p id="greenhouse-note">Life support + one light period.</p><p id="greenhouse-reason" class="action-reason"></p></div>
+            <div class="command-socket"><button data-action="shelter" aria-describedby="shelter-note shelter-reason"><span class="action-number">03 / CREW SHELTER</span><span class="action-name">Shelter</span><span class="action-cost"></span></button><p id="shelter-note">Life support + protection this shift only.</p><p id="shelter-reason" class="action-reason"></p></div>
+          </div>
+        </section>
+        <div class="console-utilities">
+          <details class="mission-log"><summary>Decision log <span id="log-count">0 / 6</span></summary><ol id="log"></ol></details>
+          <details id="source-footer" class="source-records" hidden><summary>Archive & assumptions</summary><p>Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details>
+          <button id="review-briefing" class="utility-key">Mission Briefing</button><button id="retry" class="utility-key">Retry mission</button>
+        </div>
       </section>
     </div>
-    <footer id="source-footer" class="source-footer"><p><span class="eyebrow">SCIENCE IN THE SIGNAL</span> Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><details><summary>Source & game assumptions</summary><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details></footer>
   </main>
 </body>
 </html>
