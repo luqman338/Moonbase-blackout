@@ -486,12 +486,13 @@ reducedMotion.addEventListener('change', () => {
 
 // Documentation is a view over static content. It never calls a simulation transition.
 let storyReturn = null;
-for (const [key, label] of [['demo', 'Live demo'], ['repository', 'Code repository'], ['challenge', 'Official challenge']]) {
+for (const [key, label] of [['demo', 'Play Moonbase Blackout'], ['repository', 'Code repository'], ['challenge', 'Official challenge']]) {
   const link = document.createElement('a');
   link.href = projectLinks[key];
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   link.textContent = label;
+  if (key === 'demo') link.className = 'terminal-button story-primary-link';
   el('story-links').append(link);
 }
 const contents = document.createElement('ol');
@@ -519,16 +520,9 @@ for (const [index, section] of storySections.entries()) {
   item.append(link); contents.append(item);
 }
 el('story-toc').append(contents);
-// Preserve the complete existing archive explanation alongside the expanded science section.
+// Keep data-backed provenance next to the plain-language science explanation.
 el('story-science').append(el('source-footer'));
-for (const entry of [
-  ...(editorial.projectLead ? [{ name: editorial.projectLead, contribution: editorial.projectLeadContribution || 'Project Lead' }] : []),
-  ...editorial.members,
-]) {
-  const p = document.createElement('p');
-  p.textContent = `${entry.name}: ${entry.contribution}`;
-  el('story-credits').append(p);
-}
+// Confirmed people and roles are included in the supporting narrative above.
 for (const observation of editorial.playtesting) {
   const p = document.createElement('p');
   p.textContent = observation;
@@ -566,7 +560,7 @@ try {
   events = await response.json();
   state = createGame(events);
   initialBattery = state.battery;
-  el('timing').textContent = `The supplied flare start sets the fictional mission start to ${state.fictionalScenarioStart}. The archived particle observation is ${Math.floor(state.elapsedMinutes / 60)} h ${state.elapsedMinutes % 60} min later, placing the game alert before the turn-${state.alertTurn} choice. Each turn lasts 6 hours.`;
+  el('timing').textContent = `A fictional 12-hour offset before the supplied flare start places the mission start at ${state.fictionalScenarioStart.replace('.000Z', 'Z')}. The archived particle observation follows ${Math.floor(state.elapsedMinutes / 60)} hours ${state.elapsedMinutes % 60} minutes later. With six-hour shifts (21,600,000 milliseconds), the alert appears before the shift-${state.alertTurn} choice.`;
   el('source-observation').textContent = `Recorded NASA SEP event: ${events.sep.sepID}. Observation time: ${events.sep.eventTime}. Instrument: ${events.sep.instruments.map((instrument) => instrument.displayName).join(', ')}. Retrieved: ${events.provenance.retrievedOn}.`;
   el('flare-source').textContent = `Linked flare ID: ${events.flare.flrID}. Supplied flare start: ${events.flare.beginTime}. ${events.provenance.flareProvenance}`;
   el('load-status').textContent = '';

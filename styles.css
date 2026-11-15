@@ -328,16 +328,19 @@ body[data-screen="story"] main { max-width: none; }
 .story-toolbar { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 20px; border-bottom: 1px solid var(--terminal-line); }
 .story-toolbar h2 { font: 18px/1.5 var(--mono); }
 .story-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: clamp(16px, 4vw, 48px); scrollbar-color: var(--terminal-line) var(--terminal-black); }
-.story-reading { max-width: 76ch; margin: 0 auto; font: 16px/1.8 var(--mono); overflow-wrap: anywhere; }
+.story-reading { max-width: 70ch; margin: 0 auto; font: 16px/1.8 var(--mono); overflow-wrap: anywhere; }
 .story-reading p { margin: 14px 0; }
-.story-intro { color: #d4f5ca; font-size: 18px; }
+.story-reading .story-intro { color: #d4f5ca; font-size: clamp(21px, 2.6vw, 30px); line-height: 1.4; letter-spacing: -.03em; margin-top: 0; }
 .story-reading a { color: #baf2ab; text-underline-offset: 4px; }
-.story-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 24px 0; font-size: 13px; }
+.story-links { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin: 24px 0; font-size: 13px; }
+.story-primary-link { display: inline-flex; align-items: center; text-decoration: none; }
+.story-process { display: flex; flex-wrap: wrap; gap: 8px 16px; list-style: none; padding: 12px 0; margin: 16px 0; border-block: 1px solid var(--terminal-line); font-size: 13px; color: #d4f5ca; }
+.story-process li:not(:last-child)::after { content: ' →'; padding-left: 12px; color: var(--terminal-muted); }
 #story-toc { border-block: 1px solid var(--terminal-line); padding: 14px 0; }
 #story-toc ol { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 28px; padding-left: 28px; font-size: 13px; }
 .story-reading section { scroll-margin-top: 16px; margin-top: 44px; }
 .story-reading h3 { color: #c5f6b7; font: 17px/1.6 var(--mono); padding-bottom: 10px; border-bottom: 1px solid var(--terminal-line); }
-.story-reading h3 + div h3 { font-size: 14px; margin-top: 26px; border: 0; padding: 0; }
+.story-reading h4 { color: #c5f6b7; font: 15px/1.6 var(--mono); margin: 26px 0 8px; }
 .story-reading details { border: 1px solid var(--terminal-line); margin: 24px 0; padding: 0 16px; font-size: 14px; }
 .story-reading summary { cursor: pointer; min-height: 48px; padding: 12px 0; }
 .story-reading code { font-size: .9em; color: #d0e6bc; }

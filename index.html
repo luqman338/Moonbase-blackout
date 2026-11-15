@@ -164,12 +164,29 @@
           <header class="story-toolbar"><h2 id="story-title" tabindex="-1">Behind the Mission</h2><button id="story-back" class="terminal-button">Back to Mission</button></header>
           <div class="story-scroll" tabindex="0" role="region" aria-label="Project story">
             <div class="story-reading">
-              <p class="story-intro">Run a lunar outpost on one battery for six shifts.</p>
-              <p>Read the project story, explore the science, or check the rules and evidence.</p>
+              <div id="story-challenge" class="story-hero">
+                <p class="story-intro">The first version of Moonbase Blackout worked.<br>The kids thought it was boring.</p>
+                <p>Luqman runs a community program teaching children science, technology, engineering and math (STEM), along with business and leadership. He wanted to make engineering decisions something children could understand and enjoy.</p>
+                <p>For NASA Space Apps Challenge 2026, he chose a lunar survival game: one battery, six shifts and three commands. Feedback from children in his program changed how the game tells its story and shows the result of each choice.</p>
+              </div>
               <nav id="story-links" class="story-links" aria-label="Project links"></nav>
               <nav id="story-toc" aria-label="Story sections"></nav>
               <div id="story-sections"></div>
-              <details id="source-footer" class="story-provenance"><summary>Stored observation and provenance</summary><p>Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. The animated particles are an educational schematic, not literally visible radiation or a measured lunar particle environment. NASA DONKI records are archived spacecraft observations, not predictions of lunar radiation dose. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details>
+              <details id="source-footer" class="story-provenance">
+                <summary>NASA record, clock calculation and scientific limits</summary>
+                <h4>Retrieved observation</h4>
+                <p id="source-observation"></p>
+                <p>Sources: <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC SEP record</a>, <a href="https://api.nasa.gov/DONKI/SEP?startDate=2024-05-11&amp;endDate=2024-05-11&amp;api_key=DEMO_KEY">dated NASA SEP API query</a> and the <a href="./data/events.json">stored dataset</a>. The SEP object preserves retrieved fields, including linked events, notifications, submission time and version. The wrapper’s provenance fields are local curation metadata.</p>
+                <h4>Supplied flare start</h4>
+                <p id="flare-source"></p>
+                <p>The linked flare ID is verified in the SEP data. Independent flare retrieval was unsuccessful. The local flare object is a supplied-fact subset, not a retrieved flare response. For background, see <a href="https://www.nasa.gov/learning-resources/how-does-the-sun-behave-grades-5-8/">NASA’s explanation of solar flares</a>.</p>
+                <h4>Mapping into the mission clock</h4>
+                <p><code>fictionalStart = suppliedFlareStart − 12 hours</code><br><code>elapsedMilliseconds = sepObservationTime − fictionalStart</code><br><code>alertShift = 1 + floor(elapsedMilliseconds / 21600000)</code></p>
+                <p id="timing"></p>
+                <h4>What the data does not establish</h4>
+                <p>The blackout, clock offset, 92 kWh battery, command costs and one-shift shelter protection are fictional assumptions. Shelter’s extra 6 kWh represents fictional ventilation demand. Two greenhouse light periods are a game objective, not a crop-growth model.</p>
+                <p>The NASA record does not supply those costs or validate the shelter. The model does not calculate lunar radiation dose, shielding, crop physiology, thermal behaviour or real life-support demand. Animated particles are a schematic, not literally visible radiation. No live forecast is used.</p>
+              </details>
             </div>
           </div>
         </div>
