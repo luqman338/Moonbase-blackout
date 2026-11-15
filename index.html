@@ -87,6 +87,23 @@
         <g id="solar-array"><path d="M1120 321V336M1246 299V314" stroke="#a0acab" stroke-width="5"/><path d="m1085 322 60-39h175l-60 39Z" fill="url(#cells)" stroke="#b2bfbd" stroke-width="3"/><path d="m1085 322 175 0v5h-175Z" fill="#425667"/><text x="1150" y="349" class="terrain-label">SOLAR ARRAY / OFFLINE</text></g>
         <g fill="#64717a" stroke="#849097"><path d="m185 338 13-8 16 7 3 9-27 1Z"/><path d="m1180 407 8-6 12 2 5 9-22 1Z"/><path d="m80 419 8-4 9 2 4 6-20 2Z"/></g>
       </svg>
+      <!-- Educational schematic overlay. Not measured or literally visible lunar radiation. -->
+      <svg class="particle-overlay" viewBox="0 0 1440 460" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <g fill="#f0c27a">
+          <circle class="alert-particle" cx="60" cy="20" r="2" style="--particle-delay:-0.0s"/>
+          <circle class="alert-particle" cx="86" cy="53" r="3" style="--particle-delay:-0.31s"/>
+          <circle class="alert-particle" cx="112" cy="86" r="2" style="--particle-delay:-0.62s"/>
+          <circle class="alert-particle" cx="138" cy="119" r="3" style="--particle-delay:-0.9299999999999999s"/>
+          <circle class="alert-particle" cx="164" cy="20" r="2" style="--particle-delay:-1.24s"/>
+          <circle class="alert-particle" cx="190" cy="53" r="3" style="--particle-delay:-1.55s"/>
+          <circle class="alert-particle" cx="216" cy="86" r="2" style="--particle-delay:-1.8599999999999999s"/>
+          <circle class="alert-particle" cx="242" cy="119" r="3" style="--particle-delay:-2.17s"/>
+          <circle class="alert-particle" cx="268" cy="20" r="2" style="--particle-delay:-2.48s"/>
+          <circle class="alert-particle" cx="294" cy="53" r="3" style="--particle-delay:-2.79s"/>
+          <circle class="alert-particle" cx="320" cy="86" r="2" style="--particle-delay:-3.1s"/>
+          <circle class="alert-particle" cx="346" cy="119" r="3" style="--particle-delay:-3.41s"/>
+        </g>
+      </svg>
       <div class="scene-caption"><span class="eyebrow">LUNAR SURFACE / FICTIONAL OUTPOST</span><h1>Moonbase Blackout</h1><p id="scene-story">The solar panels are down. Keep your crew alive until power returns.</p></div>
       <div class="scene-bottom"><span>OUTPOST 01 <span class="separator">/</span> 36-HOUR BLACKOUT</span><span id="scene-status">Life support online</span></div>
     </section>
@@ -105,6 +122,24 @@
             <p class="transmission-message" aria-hidden="true"><span id="transmission-text"></span><span id="transmission-cursor" class="terminal-cursor"></span></p>
           </div></div>
           <footer class="transmission-controls"><button id="skip" class="terminal-button terminal-skip">Skip Intro</button><button id="next-transmission" class="terminal-button transmission-next">Next Transmission <span aria-hidden="true">&gt;</span></button></footer>
+        </div>
+      </div>
+    </section>
+
+    <section id="mission-report" class="terminal-screen" hidden aria-labelledby="outcome-title">
+      <div class="terminal-housing">
+        <header class="station-plate"><span>OUTPOST 01 / MISSION REPORT</span><span>MAY 2024</span></header>
+        <div class="terminal-monitor report-monitor">
+          <div class="report-content">
+            <section id="outcome" aria-labelledby="outcome-title">
+              <p class="terminal-label">FINAL RESULT</p><h2 id="outcome-title" tabindex="-1"></h2>
+              <h3 class="report-section-label">MISSION READINGS</h3><p id="result-stats"></p>
+              <h3 class="report-section-label">WHAT HAPPENED</h3><p id="report-readable" class="sr-only" role="status"></p><p id="debrief" aria-hidden="true"></p><h3 class="report-section-label">WHY IT HAPPENED</h3><p id="report-why"></p><p id="critical-decisions"></p><h3 class="report-section-label">WHAT TO DO NEXT TIME</h3><p id="recommendation"></p>
+            </section>
+            <details id="report-decisions"><summary>Review Decisions</summary><ol id="report-log"></ol></details>
+            <details id="report-sources"><summary>Access Mission Sources</summary><div id="report-source-copy"></div></details>
+          </div>
+          <footer class="transmission-controls"><button id="report-retry" class="terminal-button">Retry Mission</button></footer>
         </div>
       </div>
     </section>
@@ -139,10 +174,8 @@
                 <p class="monitor-result" aria-hidden="true"><span id="feedback"></span><span id="monitor-cursor" class="terminal-cursor" hidden></span></p>
               </div>
               <p id="decision-fact"></p>
-              <div id="shift-response" hidden><button id="skip-shift" class="monitor-key">Skip transition</button></div>
-              <section id="outcome" class="outcome" hidden aria-labelledby="outcome-title">
-                <h3 id="outcome-title" tabindex="-1"></h3><p id="debrief"></p><p id="result-stats"></p>
-              </section>
+              <div id="shift-response" hidden><button id="skip-shift" class="monitor-key">Skip Animation</button><button id="continue-shift" class="monitor-key" hidden></button></div>
+
             </div>
           </section>
 
@@ -170,7 +203,7 @@
         </section>
         <div class="console-utilities">
           <details class="mission-log"><summary>Decision log <span id="log-count">0 / 6</span></summary><ol id="log"></ol></details>
-          <details id="source-footer" class="source-records" hidden><summary>Archive & assumptions</summary><p>Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details>
+          <details id="source-footer" class="source-records" hidden><summary>Archive & assumptions</summary><p>Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. The animated particles are an educational schematic, not literally visible radiation or a measured lunar particle environment. NASA DONKI records are archived spacecraft observations, not predictions of lunar radiation dose. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details>
           <button id="review-briefing" class="utility-key">Mission Briefing</button><button id="retry" class="utility-key">Retry mission</button>
         </div>
       </section>

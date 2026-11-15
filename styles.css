@@ -290,3 +290,34 @@ body[data-screen="launch"] main, body[data-screen="briefing"] main { max-width: 
   .transmission-controls .terminal-button { padding: 10px 8px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .terminal-cursor { display: none; animation: none; } }
+/* The report shares the briefing's terminal housing; its content scrolls, controls stay reachable. */
+body[data-screen="report"] { background: #060807; }
+body[data-screen="report"] main { max-width: none; }
+.report-monitor { display: flex; flex-direction: column; }
+.report-content { flex: 1; min-height: 0; overflow-y: auto; padding: clamp(18px, 4vw, 48px); overflow-wrap: anywhere; }
+.report-content h2 { font: 20px/1.5 var(--mono); margin: 8px 0 20px; }
+.report-content p { max-width: 72ch; margin: 14px 0; }
+.report-content details { border-top: 1px solid var(--terminal-line); margin-top: 18px; }
+.report-content summary { min-height: 48px; padding: 12px 0; cursor: pointer; }
+.report-content a { color: inherit; }
+.report-content ol { padding-left: 24px; }
+#mission-report[data-result="partial"] { --terminal-text: #f0c27a; --terminal-muted: #c4ae86; --terminal-line: #746044; }
+#mission-report[data-result="failure"] { --terminal-text: #ffac98; --terminal-muted: #c59181; --terminal-line: #795247; }
+#continue-shift { display: block; font-weight: 600; }
+.command-deck[data-stage="response"] .battery-meter span { transition: width 1.2s ease-out; }
+.command-deck[data-stage="acknowledged"] button.is-executing { border-left-color: #c4ffad; }
+@media (prefers-reduced-motion: reduce) { .command-deck[data-stage="response"] .battery-meter span { transition: none; } }
+.report-content #result-stats { color: var(--terminal-muted); }
+/* Schematic alert flow is confined to the observation display, never the console. */
+.particle-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: none; }
+.scene.is-alert .particle-overlay { display: block; }
+.alert-particle { animation: particle-flow 2.8s linear infinite; animation-delay: var(--particle-delay); }
+@keyframes particle-flow { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: .65; } 85% { opacity: .65; } 100% { transform: translate(650px, 185px); opacity: 0; } }
+.scene.is-alert .warning-lamp { animation: alert-pulse 1.8s ease-in-out infinite; }
+@keyframes alert-pulse { 50% { opacity: .45; } }
+.report-section-label { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--terminal-line); color: var(--terminal-muted); font: 11px/1.6 var(--mono); letter-spacing: .06em; }
+.report-content #outcome-title { color: var(--terminal-text); }
+@media (prefers-reduced-motion: reduce) {
+  .alert-particle { animation: none; opacity: .35; }
+  .scene.is-alert .warning-lamp { animation: none; }
+}

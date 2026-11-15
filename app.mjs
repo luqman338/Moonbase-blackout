@@ -11,11 +11,15 @@ let shiftTimer = 0;
 let focusAfterShift = null;
 let monitorFrame = 0;
 let monitorMessage = '';
+let transitionStage = '';
+let startingBattery = 92;
+// Real-world presentation only: 0.65 s acknowledgement, 2.6 s operation, 3.5 s transmission.
+const DECISION_TIMING = Object.freeze({ acknowledgement: 650, operation: 2600, transmission: 3500 });
 
 // The simulation commits immediately. This phase only controls presentation and input.
-// Terminal outcomes take priority over animation, including power loss after a funded shift.
+// Even terminal outcomes wait for the player to finish reading the final transmission.
 function presentationPhase() {
-  return state.outcome ? 'ended' : resolvingShift ? 'resolving' : 'awaiting';
+  return resolvingShift ? 'resolving' : state.outcome ? 'ended' : 'awaiting';
 }
 
 function outcomeReport() {
@@ -34,6 +38,7 @@ function completeMonitorMessage() {
   monitorFrame = 0;
   el('feedback').textContent = monitorMessage;
   el('monitor-cursor').hidden = true;
+  if (document.body.dataset.screen === 'report' && state?.outcome) el('debrief').textContent = outcomeReport();
 }
 
 /** Only the secondary result is typed. Alerts, costs and readings are never delayed. */
@@ -46,7 +51,7 @@ function showMonitorMessage(message) {
   el('feedback').textContent = '';
   el('monitor-cursor').hidden = false;
   const started = performance.now();
-  const duration = Math.min(600, message.length * 8);
+  const duration = resolvingShift && transitionStage === 'transmission' ? DECISION_TIMING.transmission : Math.min(600, message.length * 8);
   function reveal(now) {
     const count = Math.floor(message.length * Math.min(1, (now - started) / duration));
     el('feedback').textContent = message.slice(0, count);
@@ -69,15 +74,16 @@ function decisionFact() {
 /** Instruments always use committed resources. Activity lamps use only the resolving phase. */
 function renderInstruments() {
   const phase = presentationPhase();
-  const active = phase === 'resolving' ? resolvingShift.action : null;
-  const alert = phase === 'awaiting' && state.turn === state.alertTurn;
-  const percentage = Math.round(state.battery / initialBattery * 100);
-  el('battery').textContent = `${state.battery} kWh`;
+  const active = phase === 'resolving' && transitionStage !== 'acknowledged' ? resolvingShift.action : null;
+  const alert = phase === 'resolving' ? resolvingShift.turn === state.alertTurn : phase === 'awaiting' && state.turn === state.alertTurn;
+  const displayedBattery = phase === 'resolving' && transitionStage === 'acknowledged' ? startingBattery : state.battery;
+  const percentage = Math.round(displayedBattery / initialBattery * 100);
+  el('battery').textContent = `${displayedBattery} kWh`;
   el('battery-percent').textContent = `${percentage}%`;
-  el('battery-fill').style.width = `${state.battery / initialBattery * 100}%`;
+  el('battery-fill').style.width = `${displayedBattery / initialBattery * 100}%`;
   el('battery-meter').setAttribute('aria-valuemax', initialBattery);
-  el('battery-meter').setAttribute('aria-valuenow', state.battery);
-  el('battery-meter').setAttribute('aria-valuetext', `${state.battery} kWh, ${percentage} percent`);
+  el('battery-meter').setAttribute('aria-valuenow', displayedBattery);
+  el('battery-meter').setAttribute('aria-valuetext', `${displayedBattery} kWh, ${percentage} percent`);
   el('battery-meter').classList.toggle('low', percentage <= 30);
   el('crew').textContent = state.crew === 'safe' ? 'Crew safe' : 'Crew unsafe';
   el('shelter-status').textContent = active === 'shelter' ? `Shelter active / shift ${resolvingShift.turn}`
@@ -92,10 +98,10 @@ function renderInstruments() {
 /** The exterior shows activity for the resolving shift, never the previous command at rest. */
 function renderScene() {
   const phase = presentationPhase();
-  const active = phase === 'resolving' ? resolvingShift.action : null;
+  const active = phase === 'resolving' && transitionStage !== 'acknowledged' ? resolvingShift.action : null;
   const scene = el('scene');
   const offline = state.outcome === 'power-failure';
-  const alert = phase === 'awaiting' && state.turn === state.alertTurn;
+  const alert = phase === 'resolving' ? resolvingShift.turn === state.alertTurn : phase === 'awaiting' && state.turn === state.alertTurn;
   scene.classList.toggle('has-light', active === 'greenhouse');
   scene.classList.toggle('has-growth', state.lightPeriods > 0);
   scene.classList.toggle('is-sheltered', active === 'shelter');
@@ -117,7 +123,23 @@ function renderScene() {
 
 function renderMonitor(phase) {
   const ended = phase === 'ended';
-  const alert = phase === 'awaiting' && state.turn === state.alertTurn;
+  const alert = phase === 'resolving' ? resolvingShift.turn === state.alertTurn : phase === 'awaiting' && state.turn === state.alertTurn;
+  if (phase === 'resolving') {
+    el('monitor-phase').textContent = `${transitionStage.toUpperCase()} / SHIFT ${resolvingShift.turn}`;
+    el('warning').textContent = transitionStage === 'acknowledged' ? 'Command acknowledged.'
+      : state.outcome === 'power-failure' ? 'Life support offline.' : alert ? state.crew === 'unsafe' ? 'PARTICLE ALERT / SHELTER MISSED' : 'PARTICLE ALERT / CREW SHELTER ACTIVE' : 'Command result';
+    el('warning').classList.toggle('alert', alert);
+    el('warning').classList.toggle('failure', Boolean(state.outcome && state.crew === 'unsafe'));
+    el('alert-source').hidden = !alert;
+    el('previous-report').hidden = false;
+    el('report-label').textContent = `SHIFT ${String(resolvingShift.turn).padStart(2, '0')} / ${resolvingShift.cost} kWh USED`;
+    el('decision-fact').hidden = true;
+    el('shift-response').hidden = false;
+    el('skip-shift').hidden = transitionStage === 'ready';
+    el('continue-shift').hidden = transitionStage !== 'ready';
+    el('continue-shift').textContent = state.outcome ? 'VIEW MISSION REPORT' : `CONTINUE TO SHIFT ${String(state.turn).padStart(2, '0')}`;
+    return;
+  }
   const last = phase === 'resolving' ? state.log.at(-2) : state.log.at(-1);
   el('monitor-phase').textContent = phase === 'resolving' ? `RESOLVING / SHIFT ${resolvingShift.turn}`
     : ended ? 'MISSION ENDED' : `AWAITING / SHIFT ${state.turn}`;
@@ -158,8 +180,9 @@ function render() {
   const phase = presentationPhase();
   const displayedTurn = phase === 'resolving' ? resolvingShift.turn : state.turn;
   const ended = phase === 'ended';
-  const alert = phase === 'awaiting' && state.turn === state.alertTurn;
+  const alert = phase === 'resolving' ? resolvingShift.turn === state.alertTurn : phase === 'awaiting' && state.turn === state.alertTurn;
   el('command').dataset.phase = phase;
+  el('command').dataset.stage = transitionStage;
   el('command').dataset.command = phase === 'resolving' ? resolvingShift.action : 'none';
   el('command').dataset.failure = ended && state.crew === 'unsafe';
   el('command').classList.toggle('is-transitioning', phase === 'resolving');
@@ -203,7 +226,7 @@ function render() {
     item.textContent = `Shift ${entry.turn}: ${ACTIONS[entry.action].label}, ${entry.cost} kWh.${phase === 'resolving' && entry === resolvingShift ? ' Resolving.' : ''}`;
     return item;
   }));
-  if (ended) el('outcome-title').focus();
+
 }
 
 // Intro state belongs only to this adapter. No transmission consumes mission time.
@@ -224,6 +247,7 @@ let lastNextTime = -Infinity;
 
 function setScreen(screen) {
   document.body.dataset.screen = screen;
+  el('mission-report').hidden = screen !== 'report';
   el('launch').hidden = screen !== 'launch';
   el('briefing').hidden = screen !== 'briefing';
   el('command').hidden = screen !== 'game';
@@ -335,6 +359,7 @@ function resetPresentation() {
   clearTimeout(shiftTimer);
   shiftTimer = 0;
   resolvingShift = null;
+  transitionStage = '';
   focusAfterShift = null;
   completeMonitorMessage();
   monitorMessage = '';
@@ -342,49 +367,120 @@ function resetPresentation() {
   el('feedback-readable').textContent = '';
 }
 
-/** Finish only presentation. Simulation time and resources were already committed once. */
-function finishShift() {
-  if (!resolvingShift) return;
-  clearTimeout(shiftTimer);
-  shiftTimer = 0;
-  resolvingShift = null;
-  render();
-  if (!state.outcome) {
-    if (state.turn === state.alertTurn) el('warning').focus();
-    else if (focusAfterShift && !focusAfterShift.disabled) focusAfterShift.focus({ preventScroll: true });
-    else buttons.find((button) => !button.disabled)?.focus({ preventScroll: true });
-  }
+/** All timers finish visuals only. Advancement is always an explicit player action. */
+function commandResult() {
+  if (!resolvingShift.action) return outcomeReport();
+  return `${ACTIONS[resolvingShift.action].label}: ${resolvingShift.cost} kWh used. ` + ({
+    conserve: 'Life support supplied. Optional systems remained off.',
+    greenhouse: 'One greenhouse light period delivered.',
+    shelter: 'Crew sheltered for this shift only.',
+  }[resolvingShift.action]) + (state.outcome ? ` ${outcomeReport()}` : '');
 }
 
-el('skip-shift').addEventListener('click', finishShift);
+function readyToContinue() {
+  if (!resolvingShift) return;
+  transitionStage = 'ready';
+  completeMonitorMessage();
+  render();
+  el('continue-shift').focus({ preventScroll: true });
+}
+
+function revealCommandResult() {
+  if (!resolvingShift) return;
+  transitionStage = 'transmission';
+  render();
+  showMonitorMessage(commandResult());
+  // The full transmission finishes before the player can advance.
+  shiftTimer = setTimeout(readyToContinue, DECISION_TIMING.transmission);
+}
+
+function skipAnimation() {
+  if (!resolvingShift || transitionStage === 'ready') return;
+  clearTimeout(shiftTimer);
+  showMonitorMessage(commandResult());
+  readyToContinue();
+}
+
+function openMissionReport() {
+  completeMonitorMessage();
+  setScreen('report');
+  const partial = state.outcome === 'partial-success';
+  el('mission-report').dataset.result = partial ? 'partial' : state.crew === 'unsafe' ? 'failure' : 'success';
+  el('outcome-title').textContent = state.outcome === 'full-win' ? 'FULL SUCCESS' : partial ? 'PARTIAL SUCCESS' : 'MISSION FAILED';
+  const summary = outcomeReport();
+  el('report-readable').textContent = summary;
+  el('debrief').textContent = summary;
+  if (!reducedMotion.matches) {
+    const started = performance.now();
+    function revealReport(now) {
+      const progress = Math.min(1, (now - started) / 700);
+      el('debrief').textContent = summary.slice(0, Math.floor(summary.length * progress));
+      if (progress < 1) monitorFrame = requestAnimationFrame(revealReport);
+    }
+    monitorFrame = requestAnimationFrame(revealReport);
+  }
+  el('result-stats').textContent = `${state.crew === 'safe' ? 'Crew safe' : 'Crew unsafe'} / Battery: ${state.battery} kWh / Greenhouse: ${state.lightPeriods}/2 / ${state.log.length} of ${TOTAL_TURNS} shifts completed`;
+  const shelter = state.log.find(entry => entry.turn === state.alertTurn && entry.action === 'shelter');
+  const lights = state.log.filter(entry => entry.action === 'greenhouse').map(entry => entry.turn);
+  el('critical-decisions').textContent = `Alert shift ${state.alertTurn}: ${shelter ? 'Shelter selected.' : 'Shelter not completed.'} Greenhouse shifts: ${lights.length ? lights.join(', ') : 'none'}.`;
+  const advice = state.outcome === 'partial-success' ? 'Reserve energy and shifts for two greenhouse light periods.'
+    : state.outcome === 'missed-shelter' ? 'Choose Shelter when the particle alert appears. Earlier shelter does not carry forward.'
+      : state.crew === 'unsafe' ? 'Check the next command’s total cost and keep enough energy for life support and alert-shift shelter.' : '';
+  el('recommendation').textContent = advice;
+  el('recommendation').textContent = advice || `Shelter covered alert shift ${state.alertTurn}, and ${state.lightPeriods} greenhouse light periods were delivered within the battery budget.`;
+  el('recommendation').hidden = false;
+  el('report-why').textContent = state.outcome === 'missed-shelter' ? `The shift-${state.alertTurn} command did not select Shelter. Protection from earlier shifts does not carry forward.`
+    : state.outcome === 'power-failure' ? `The recorded commands left ${state.battery} kWh before shift ${state.turn}, below the 12 kWh life-support cost.`
+      : state.outcome === 'shelter-power-shortfall' ? `The battery was below the 18 kWh required for alert-shift shelter.`
+        : partial ? `Only ${lights.length} Greenhouse commands were completed. Two were required.`
+          : 'All six shifts completed with safe crew and the greenhouse light goal reached.';
+  el('report-log').replaceChildren(...[...el('log').children].map(node => node.cloneNode(true)));
+  el('report-source-copy').replaceChildren(...[...el('source-footer').children].filter(node => node.tagName !== 'SUMMARY').map(node => node.cloneNode(true)));
+  el('report-source-copy').querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+  el('report-decisions').open = false;
+  el('report-sources').open = false;
+  el('outcome-title').focus();
+  window.scrollTo(0, 0);
+}
+
+el('skip-shift').addEventListener('click', skipAnimation);
+el('continue-shift').addEventListener('click', () => {
+  if (!resolvingShift || transitionStage !== 'ready') return;
+  resetPresentation();
+  if (state.outcome) { render(); openMissionReport(); return; }
+  render();
+  if (state.turn === state.alertTurn) el('warning').focus();
+  else buttons.find(button => !button.disabled)?.focus({ preventScroll: true });
+});
+el('report-retry').addEventListener('click', () => el('retry').click());
 for (const button of buttons) {
-  button.addEventListener('keydown', (event) => {
+  button.addEventListener('keydown', event => {
     if (event.repeat && (event.key === 'Enter' || event.key === ' ')) event.preventDefault();
   });
-  button.addEventListener('click', (event) => {
+  button.addEventListener('click', event => {
     if (resolvingShift || state.outcome || button.disabled || event.detail > 1) return;
     const previous = state;
     const next = chooseAction(state, button.dataset.action);
     state = next;
-    // Rejected commands and immediate failures have no successful shift to animate.
-    if (next.log.length === previous.log.length || next.outcome || reducedMotion.matches) {
-      render();
-      if (!state.outcome && state.turn === state.alertTurn) el('warning').focus();
-      return;
-    }
-    resolvingShift = next.log.at(-1);
+    const accepted = next.log.length > previous.log.length;
+    if (!accepted && !next.outcome) { render(); return; }
+    startingBattery = previous.battery;
+    resolvingShift = accepted ? next.log.at(-1) : { turn: previous.turn, action: null, cost: 0 };
     focusAfterShift = button;
+    transitionStage = 'acknowledged';
+    showMonitorMessage('');
     render();
-    // Shift number, timeline and incoming alert update only after this visual interval.
-    shiftTimer = setTimeout(finishShift, 1000);
+    if (reducedMotion.matches) { skipAnimation(); return; }
+    shiftTimer = setTimeout(() => {
+      transitionStage = 'response';
+      render();
+      shiftTimer = setTimeout(revealCommandResult, DECISION_TIMING.operation);
+    }, DECISION_TIMING.acknowledgement);
     el('skip-shift').focus({ preventScroll: true });
   });
 }
 reducedMotion.addEventListener('change', () => {
-  if (reducedMotion.matches) {
-    completeMonitorMessage();
-    finishShift();
-  }
+  if (reducedMotion.matches) { completeMonitorMessage(); skipAnimation(); }
 });
 
 // Relative data paths work in a local preview and below a repository URL prefix.
