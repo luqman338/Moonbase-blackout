@@ -25,7 +25,7 @@ export function createGame(events) {
   return {
     scenario: 'May 2024', ...getTiming(events), turn: 1, battery: 92,
     lightPeriods: 0, crew: 'safe', outcome: null, log: [],
-    feedback: 'Command is yours. Choose how to spend energy for the next 6 hours.',
+    feedback: 'You are in charge. Choose power use for six hours.',
   };
 }
 
@@ -43,10 +43,10 @@ export function beforeTurn(state) {
 }
 
 export function getWarning(state) {
-  if (state.outcome) return 'Mission ended. Read your debrief below.';
+  if (state.outcome) return 'Mission over. Read your report.';
   return state.turn === state.alertTurn
-    ? 'Particle alert this turn! Choose Shelter now to keep the crew safe. Earlier shelter does not count.'
-    : 'No particle alert this turn. Shelter protects only the turn when you choose it.';
+    ? 'Danger from the Sun! Choose Shelter now. Shelter from an earlier shift will not help.'
+    : 'No Sun danger this shift. Shelter works for one shift only.';
 }
 
 /** Funded choices on the alert must be Shelter. Failed choices spend nothing. */
@@ -54,19 +54,19 @@ export function chooseAction(state, action) {
   const ready = beforeTurn(state);
   if (ready.outcome) return ready;
   const move = ACTIONS[action];
-  if (!move) return { ...ready, feedback: 'Choose one of the three mission actions.' };
+  if (!move) return { ...ready, feedback: 'Choose Conserve, Greenhouse or Shelter.' };
   if (ready.battery < move.cost) {
     return { ...ready, feedback: `${move.label} needs ${move.cost} kWh. You have ${ready.battery} kWh.` };
   }
   if (ready.turn === ready.alertTurn && action !== 'shelter') {
     return { ...ready, crew: 'unsafe', outcome: 'missed-shelter',
-      feedback: 'The crew missed shelter. No energy was spent on this choice.' };
+      feedback: 'The crew missed shelter. This choice used no power.' };
   }
   const next = {
     ...ready, battery: ready.battery - move.cost,
     lightPeriods: ready.lightPeriods + (action === 'greenhouse' ? 1 : 0),
     log: [...ready.log, { turn: ready.turn, action, cost: move.cost }],
-    feedback: `Turn ${ready.turn}: ${move.label} used ${move.cost} kWh.${action === 'greenhouse' ? ' Added 1 light period.' : ''}${action === 'shelter' ? ' Crew sheltered for that turn only.' : ''}`,
+    feedback: `Shift ${ready.turn}: ${move.label} used ${move.cost} kWh.${action === 'greenhouse' ? ' Plants got one shift of light.' : ''}${action === 'shelter' ? ' Crew stayed in shelter for that shift.' : ''}`,
   };
   // Six completed moves end the blackout, even with less than 12 kWh left.
   if (ready.turn === TOTAL_TURNS) {
@@ -80,11 +80,23 @@ export function chooseAction(state, action) {
 /** Explain the decisive choice and one useful action for the next attempt. */
 export function getDebrief(state) {
   switch (state.outcome) {
-    case 'full-win': return { title: 'Mission complete!', text: `Your crew is safe, and the greenhouse received ${state.lightPeriods} light periods. Sheltering on turn ${state.alertTurn} was the key safety choice. Next time, keep that shelter plan and check your energy before every move.` };
-    case 'partial-success': return { title: 'Partial success', text: `You survived all 36 hours with a safe crew, but delivered ${state.lightPeriods} of 2 needed light periods. Choosing fewer than two Greenhouse turns left the plants short. Next time, budget for two Greenhouse turns and one alert-turn Shelter.` };
-    case 'missed-shelter': return { title: 'Mission ended: missed shelter', text: `The non-Shelter choice on turn ${state.alertTurn} left the crew unsafe. Next time, choose Shelter when the particle warning appears, even if you sheltered earlier.` };
-    case 'shelter-power-shortfall': return { title: 'Mission ended: shelter power shortfall', text: `You reached the alert with only ${state.battery} kWh, below Shelter's 18 kWh cost. Next time, conserve earlier so at least 18 kWh remains for the alert.` };
-    case 'power-failure': return { title: 'Mission ended: power failure', text: `Only ${state.battery} kWh remained before turn ${state.turn}. Life support needs 12 kWh. Extra 18 kWh actions used the reserve. Next time, plan two Greenhouse turns, one alert-turn Shelter, and three Conserve turns.` };
+    case 'full-win': return { title: 'Mission complete!', text: `The crew is safe. Plants got ${state.lightPeriods} shifts of light. You used Shelter on shift ${state.alertTurn}. Check your power before each choice next time too.` };
+    case 'partial-success': return { title: 'Crew safe. Plants need light.', text: `The crew is safe after 36 hours. Plants got ${state.lightPeriods} of 2 light shifts. Try again. Save power for two Greenhouse shifts and Shelter when warned.` };
+    case 'missed-shelter': return { title: 'Mission over: missed shelter', text: `The crew missed shelter on shift ${state.alertTurn}. Choose Shelter when warned. Shelter from an earlier shift will not help.` };
+    case 'shelter-power-shortfall': return { title: 'Not enough power for Shelter', text: `You had ${state.battery} kWh. Shelter needs 18 kWh. Try saving more power before the warning.` };
+    case 'power-failure': return { title: 'Mission over: not enough power', text: `You had ${state.battery} kWh before shift ${state.turn}. The crew needs 12 kWh for air and heat. Try saving more power for later shifts.` };
     default: return null;
+  }
+}
+
+/** Lessons link game outcomes to planning without claiming real mission rules. */
+export function getMissionLesson(state) {
+  switch (state.outcome) {
+    case 'full-win': return 'Your plan kept the crew safe and lit the plants. Real space crews must plan their power use too.';
+    case 'partial-success': return 'You kept the crew safe, but plants needed more light. Real space crews must plan for more than one need.';
+    case 'missed-shelter': return 'The crew missed shelter when danger came. Real space crews must take safety steps at the right time.';
+    case 'power-failure': return 'Your choices left too little power for air and heat. Real space crews must save power for later needs.';
+    case 'shelter-power-shortfall': return 'Too little power was left for Shelter when needed. Real space crews must plan power for safety too.';
+    default: return '';
   }
 }

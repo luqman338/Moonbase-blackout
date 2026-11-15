@@ -61,8 +61,8 @@ test('Warning is present before the turn-3 choice', () => {
   assert.equal(s.turn, 3);
   assert.equal(s.outcome, null);
   assert.equal(s.log.length, 2);
-  assert.match(getWarning(s), /Particle alert this turn! Choose Shelter now/);
-  assert.doesNotMatch(getWarning(createGame(events)), /Particle alert this turn!/);
+  assert.match(getWarning(s), /Danger from the Sun! Choose Shelter now/);
+  assert.doesNotMatch(getWarning(createGame(events)), /Danger from the Sun!/);
 });
 test('UI warning precedes controls and is rendered before enabling choices', async () => {
   const html = await readFile(new URL('./index.html', import.meta.url), 'utf8');

@@ -1,5 +1,5 @@
 /** DOM adapter: archive provenance, terminal screens and a phase-driven command console. */
-import { ACTIONS, TOTAL_TURNS, createGame, retry, chooseAction, getWarning, getDebrief } from './game.mjs';
+import { ACTIONS, TOTAL_TURNS, createGame, retry, chooseAction, getWarning, getDebrief, getMissionLesson } from './game.mjs';
 
 import { storySections, projectLinks, editorial } from './mission-story.mjs';
 
@@ -26,11 +26,11 @@ function presentationPhase() {
 
 function outcomeReport() {
   switch (state.outcome) {
-    case 'full-win': return `36 hours complete. Crew safe. Greenhouse received ${state.lightPeriods} light periods.`;
-    case 'partial-success': return `36 hours complete. Crew safe. Greenhouse received ${state.lightPeriods} of 2 required light periods.`;
-    case 'missed-shelter': return `Shelter was not selected for shift ${state.alertTurn}. Crew unsafe. No energy was spent on the failed command.`;
-    case 'shelter-power-shortfall': return `${state.battery} kWh remained. Shelter required 18 kWh for this shift. Crew unsafe.`;
-    case 'power-failure': return `${state.battery} kWh remained before shift ${state.turn}. Life support requires 12 kWh. Life support is offline.`;
+    case 'full-win': return `All 36 hours done. Crew safe. Plants got ${state.lightPeriods} shifts of light.`;
+    case 'partial-success': return `All 36 hours done. Crew safe. Plants got ${state.lightPeriods} of 2 light shifts.`;
+    case 'missed-shelter': return `The crew missed shelter on shift ${state.alertTurn}. The crew is not safe. That choice used no power.`;
+    case 'shelter-power-shortfall': return `You had ${state.battery} kWh. Shelter needs 18 kWh this shift. The crew is not safe.`;
+    case 'power-failure': return `You had ${state.battery} kWh before shift ${state.turn}. Air and heat need 12 kWh. They stopped working.`;
     default: return '';
   }
 }
@@ -66,10 +66,10 @@ function showMonitorMessage(message) {
 function decisionFact() {
   const lightsNeeded = Math.max(0, 2 - state.lightPeriods);
   const shiftsLeft = TOTAL_TURNS - state.log.length;
-  if (state.battery < ACTIONS.greenhouse.cost) return `Only Conserve is affordable at ${state.battery} kWh.`;
-  if (lightsNeeded > shiftsLeft) return `${shiftsLeft} shifts remain. The two-period light goal can no longer be reached.`;
-  if (lightsNeeded && shiftsLeft <= 2) return `${lightsNeeded} more light ${lightsNeeded === 1 ? 'period is' : 'periods are'} needed before the mission ends.`;
-  if (state.lightPeriods >= 2) return 'Light goal reached. Extra Greenhouse commands still use 18 kWh.';
+  if (state.battery < ACTIONS.greenhouse.cost) return `Only Conserve fits your power left. You have ${state.battery} kWh.`;
+  if (lightsNeeded > shiftsLeft) return `${shiftsLeft} shifts remain. There is no time left for two light shifts.`;
+  if (lightsNeeded && shiftsLeft <= 2) return `Plants need ${lightsNeeded} more ${lightsNeeded === 1 ? 'shift' : 'shifts'} of light.`;
+  if (state.lightPeriods >= 2) return 'Plants have enough light. Greenhouse still costs 18 kWh.';
   return '';
 }
 
@@ -87,12 +87,14 @@ function renderInstruments() {
   el('battery-meter').setAttribute('aria-valuenow', displayedBattery);
   el('battery-meter').setAttribute('aria-valuetext', `${displayedBattery} kWh, ${percentage} percent`);
   el('battery-meter').classList.toggle('low', percentage <= 30);
-  el('crew').textContent = state.crew === 'safe' ? 'Crew safe' : 'Crew unsafe';
-  el('shelter-status').textContent = active === 'shelter' ? `Shelter active / shift ${resolvingShift.turn}`
-    : alert ? 'Shelter required this shift' : 'Shelter inactive';
-  el('greenhouse').textContent = `${state.lightPeriods} / 2`;
-  el('plant-status').textContent = state.lightPeriods >= 2 ? 'Light goal reached' : `${2 - state.lightPeriods} more needed`;
+  el('crew').textContent = state.crew === 'unsafe' ? 'Crew not safe' : alert && phase === 'awaiting' ? 'Crew in danger' : 'Crew safe';
+  el('shelter-status').hidden = alert && phase === 'awaiting';
+  el('shelter-status').textContent = active === 'shelter' ? `Shelter on / shift ${resolvingShift.turn}`
+    : alert ? 'Use Shelter this shift' : 'Shelter off';
+  el('greenhouse').textContent = `${state.lightPeriods} of 2`;
+  el('plant-status').textContent = state.lightPeriods >= 2 ? 'Plants got enough light!' : `Give plants light ${2 - state.lightPeriods} more ${state.lightPeriods === 1 ? 'time' : 'times'}.`;
   el('light-status').textContent = active === 'greenhouse' ? `Grow lights on / shift ${resolvingShift.turn}` : 'Grow lights off';
+  el('light-status').hidden = active !== 'greenhouse';
   [...document.querySelectorAll('.light-periods span')].forEach((lamp, index) => lamp.classList.toggle('lit', state.lightPeriods > index));
   document.body.dataset.crew = state.crew;
 }
@@ -115,53 +117,56 @@ function renderScene() {
   scene.classList.toggle('is-transitioning', phase === 'resolving');
   scene.dataset.phase = phase;
   scene.dataset.command = active || 'none';
-  el('scene-status').textContent = offline ? 'HABITAT / LIFE SUPPORT OFFLINE'
-    : state.crew === 'unsafe' ? 'CREW PROTECTION / FAILED'
-      : active === 'shelter' ? `SHELTER ACTIVE / SHIFT ${resolvingShift.turn} ONLY`
+  el('scene-status').textContent = offline ? 'BASE / AIR AND HEAT OFF'
+    : state.crew === 'unsafe' ? 'CREW / NOT SAFE'
+      : active === 'shelter' ? `SHELTER ON / SHIFT ${resolvingShift.turn} ONLY`
         : active === 'greenhouse' ? `GROW LIGHTS ON / SHIFT ${resolvingShift.turn}`
-          : alert ? 'PARTICLE ALERT / SHELTER REQUIRED' : 'ESSENTIAL SYSTEMS ONLINE';
+          : alert ? 'SUN DANGER / USE SHELTER' : 'AIR AND HEAT ON';
   el('scene-story').textContent = phase === 'ended' ? outcomeReport() : el('scene-status').textContent;
 }
 
 function renderMonitor(phase) {
   const ended = phase === 'ended';
   const alert = phase === 'resolving' ? resolvingShift.turn === state.alertTurn : phase === 'awaiting' && state.turn === state.alertTurn;
+  el('safety-warning').hidden = !alert;
+  // Change live-region text only when its message changes, not on every redraw.
   if (phase === 'resolving') {
-    el('monitor-phase').textContent = `${transitionStage.toUpperCase()} / SHIFT ${resolvingShift.turn}`;
-    el('warning').textContent = transitionStage === 'acknowledged' ? 'Command acknowledged.'
-      : state.outcome === 'power-failure' ? 'Life support offline.' : alert ? state.crew === 'unsafe' ? 'PARTICLE ALERT / SHELTER MISSED' : 'PARTICLE ALERT / CREW SHELTER ACTIVE' : 'Command result';
+    el('monitor-phase').textContent = `${({ acknowledged: 'CHOICE RECEIVED', response: 'SYSTEM RUNNING', transmission: 'SHIFT REPORT', ready: 'READY' })[transitionStage]} / SHIFT ${resolvingShift.turn}`;
+    const warning = alert ? state.crew === 'unsafe' ? 'The crew missed Shelter.' : 'The crew is in Shelter this shift.' : '';
+    if (el('warning').textContent !== warning) el('warning').textContent = warning;
     el('warning').classList.toggle('alert', alert);
     el('warning').classList.toggle('failure', Boolean(state.outcome && state.crew === 'unsafe'));
-    el('alert-source').hidden = !alert;
     el('previous-report').hidden = false;
     el('report-label').textContent = `SHIFT ${String(resolvingShift.turn).padStart(2, '0')} / ${resolvingShift.cost} kWh USED`;
     el('decision-fact').hidden = true;
     el('shift-response').hidden = false;
     el('skip-shift').hidden = transitionStage === 'ready';
     el('continue-shift').hidden = transitionStage !== 'ready';
-    el('continue-shift').textContent = state.outcome ? 'VIEW MISSION REPORT' : `CONTINUE TO SHIFT ${String(state.turn).padStart(2, '0')}`;
+    el('continue-shift').textContent = state.outcome ? 'READ MISSION REPORT' : `CONTINUE TO SHIFT ${String(state.turn).padStart(2, '0')}`;
     return;
   }
   const last = phase === 'resolving' ? state.log.at(-2) : state.log.at(-1);
-  el('monitor-phase').textContent = phase === 'resolving' ? `RESOLVING / SHIFT ${resolvingShift.turn}`
-    : ended ? 'MISSION ENDED' : `AWAITING / SHIFT ${state.turn}`;
-  el('warning').textContent = getWarning(state);
+  el('monitor-phase').textContent = phase === 'resolving' ? `RUNNING / SHIFT ${resolvingShift.turn}`
+    : ended ? 'MISSION ENDED' : `CHOOSE / SHIFT ${state.turn}`;
+  if (alert) {
+    const warning = 'Sun danger! Choose Shelter now!';
+    if (el('warning').textContent !== warning) el('warning').textContent = warning;
+  } else if (el('warning').textContent !== getWarning(state)) el('warning').textContent = getWarning(state);
   if (phase === 'resolving') {
     el('warning').textContent = {
-      conserve: 'Life support running. Nonessential systems off.',
-      greenhouse: 'Grow lights active for this shift. One light period recorded.',
-      shelter: 'Shelter active for this shift only. Crew protected.',
+      conserve: 'Air and heat on. Other systems off.',
+      greenhouse: 'Plant lights on. One light shift added.',
+      shelter: 'Shelter on for this shift. Crew safe.',
     }[resolvingShift.action];
   } else if (ended) {
-    el('warning').textContent = state.outcome === 'power-failure' ? 'LIFE SUPPORT OFFLINE'
-      : state.crew === 'unsafe' ? 'CREW PROTECTION FAILED' : '36-HOUR BLACKOUT COMPLETE';
+    el('warning').textContent = state.outcome === 'power-failure' ? 'AIR AND HEAT OFF'
+      : state.crew === 'unsafe' ? 'CREW NOT SAFE' : '36-HOUR BLACKOUT OVER';
   }
   el('warning').classList.toggle('alert', alert);
   el('warning').classList.toggle('failure', ended && state.crew === 'unsafe');
-  el('alert-source').hidden = !alert;
   el('previous-report').hidden = !last;
   el('report-label').textContent = last ? `PREVIOUS SHIFT ${String(last.turn).padStart(2, '0')} / COMPLETE` : '';
-  showMonitorMessage(last ? `${ACTIONS[last.action].label}: ${last.cost} kWh used.${last.action === 'greenhouse' ? ' One light period delivered.' : last.action === 'shelter' ? ' Protection ended with that shift.' : ''}` : '');
+  showMonitorMessage(last ? `${ACTIONS[last.action].label}: ${last.cost} kWh used.${last.action === 'greenhouse' ? ' Plants got one shift of light.' : last.action === 'shelter' ? ' Shelter ended with that shift.' : ''}` : '');
   const fact = phase === 'awaiting' && !alert ? decisionFact() : '';
   el('decision-fact').textContent = fact;
   el('decision-fact').hidden = !fact;
@@ -171,7 +176,7 @@ function renderMonitor(phase) {
   if (debrief) {
     el('outcome-title').textContent = debrief.title.replace(/!$/, '');
     el('debrief').textContent = outcomeReport();
-    el('result-stats').textContent = `${state.battery} kWh remaining / ${state.lightPeriods} light periods`;
+    el('result-stats').textContent = `${state.battery} kWh left / ${state.lightPeriods} plant light shifts`;
   } else {
     for (const id of ['outcome-title', 'debrief', 'result-stats']) el(id).textContent = '';
   }
@@ -199,9 +204,9 @@ function render() {
     button.querySelector('.action-cost').textContent = `${cost} kWh total`;
     button.disabled = phase !== 'awaiting' || state.battery < cost;
     button.classList.toggle('is-executing', phase === 'resolving' && action === resolvingShift.action);
-    el(`${action}-reason`).textContent = ended ? 'Mission ended' : phase === 'resolving' ? 'Command in progress'
-      : state.battery < cost ? `Unavailable: needs ${cost} kWh; ${state.battery} kWh remains.`
-        : `${state.battery - cost} kWh after selection`;
+    el(`${action}-reason`).textContent = ended ? 'Mission ended' : phase === 'resolving' ? 'Choice running'
+      : state.battery < cost ? `Not enough power. Needs ${cost} kWh. ${state.battery} kWh left.`
+        : `${state.battery - cost} kWh left after this choice`;
   }
   el('review-briefing').disabled = phase === 'resolving';
   el('story-game').disabled = phase === 'resolving';
@@ -215,18 +220,18 @@ function render() {
     item.classList.toggle('current', current);
     item.classList.toggle('alert-turn', alert && turn === state.alertTurn);
     if (current) item.setAttribute('aria-current', 'step');
-    item.setAttribute('aria-label', `Shift ${turn}: ${current ? phase === 'resolving' ? 'resolving' : 'awaiting command' : entry ? ACTIONS[entry.action].label + ' complete' : ended ? 'unplayed' : 'upcoming'}`);
+    item.setAttribute('aria-label', `Shift ${turn}: ${current ? phase === 'resolving' ? 'running' : 'choose a command' : entry ? ACTIONS[entry.action].label + ' complete' : ended ? 'not played' : 'next'}`);
     const label = document.createElement('span');
     label.textContent = `0${turn}`;
     const detail = document.createElement('small');
-    detail.textContent = current ? phase === 'resolving' ? 'Running' : 'Current' : entry ? 'Done' : ended ? 'Unplayed' : `${(turn - 1) * 6}–${turn * 6} h`;
+    detail.textContent = current ? phase === 'resolving' ? 'Running' : 'Current' : entry ? 'Done' : ended ? 'Not played' : `${(turn - 1) * 6}–${turn * 6} h`;
     item.append(label, detail);
     return item;
   }));
   el('log-count').textContent = `${state.log.length} / ${TOTAL_TURNS}`;
   el('log').replaceChildren(...state.log.map((entry) => {
     const item = document.createElement('li');
-    item.textContent = `Shift ${entry.turn}: ${ACTIONS[entry.action].label}, ${entry.cost} kWh.${phase === 'resolving' && entry === resolvingShift ? ' Resolving.' : ''}`;
+    item.textContent = `Shift ${entry.turn}: ${ACTIONS[entry.action].label}, ${entry.cost} kWh.${phase === 'resolving' && entry === resolvingShift ? ' Running.' : ''}`;
     return item;
   }));
 
@@ -234,11 +239,11 @@ function render() {
 
 // Intro state belongs only to this adapter. No transmission consumes mission time.
 const transmissions = [
-  { title: 'Command transfer', text: 'Outpost 01 to Commander. Our solar panels have stopped generating power. You are taking command of the base. The crew is inside, and every system now depends on the battery you control.' },
-  { title: 'Running on reserves', text: 'We expect a 36-hour blackout: six shifts of six hours each. One battery holds 92 kWh of energy for the whole base. It cannot recharge during this mission. What you spend now is gone.' },
-  { title: 'One command per shift', text: 'Life support needs 12 kWh each shift. Conserve costs 12 kWh total. Greenhouse and Shelter each cost 18 kWh total, including life support. Choose one command per shift. Extra power spent now leaves less for later.' },
-  { title: 'Crew and crops', text: 'Give the greenhouse two light periods before the blackout ends. When a particle alert arrives, choose Shelter to protect the crew. Shelter lasts one shift only. Going in early will not protect a later shift.' },
-  { title: 'Your console is ready', text: 'Check the battery bar before each command. Read crew status and greenhouse progress, then check incoming alerts above the action buttons. Select Assume Command to open the console. Your first choice starts the six-hour shift.' },
+  { title: 'You are in charge', text: 'MISSION CONTROL: Our Moon base has lost solar power. That means power from the Sun. You are in charge. The crew is your space team. Keep them safe until power returns.' },
+  { title: 'One battery', text: 'The blackout lasts 36 hours. You have six shifts, each six hours long. Your battery holds 92 kWh. A kWh is a unit of energy. The battery cannot charge during this mission.' },
+  { title: 'Choose one command', text: 'Choose one command each shift. Conserve saves power: 12 kWh. Greenhouse runs lights in the plant room: 18 kWh. Shelter powers a safer room: 18 kWh. All three run life support: air and heat for the crew.' },
+  { title: 'Watch for danger', text: 'The plants need two shifts of light. Watch for a particle alert. Tiny bits from the Sun can harm the crew. Choose Shelter when that warning comes. The safer room protects the crew for one shift only.' },
+  { title: 'Plan for now and later', text: 'Real space crews have limited power, food and supplies. They plan what to use now and what to save. This game lets you try a simple version. Check power, plants and warnings before each choice. Select Take Command to start.' },
 ];
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let transmissionIndex = 0;
@@ -272,10 +277,10 @@ function showTransmission() {
   el('transmission-body').scrollTop = 0;
   el('transmission-title').textContent = message.title;
   el('transmission-count').textContent = `${String(transmissionIndex + 1).padStart(2, '0')}/05`;
-  el('transmission-id').textContent = `MB-0${transmissionIndex + 1} / ${reviewing ? 'BRIEFING REVIEW' : 'COMMAND TRANSFER'}`;
+  el('transmission-id').textContent = `MB-0${transmissionIndex + 1} / ${reviewing ? 'MISSION HELP' : 'YOUR MISSION'}`;
   el('transmission-readable').textContent = message.text;
   el('next-transmission').textContent = transmissionIndex === transmissions.length - 1
-    ? reviewing ? 'Return to Mission' : 'Assume Command' : 'Next Transmission >';
+    ? reviewing ? 'Return to Mission' : 'Take Command' : 'Next Message >';
   el('transmission-text').textContent = '';
   el('transmission-cursor').hidden = false;
   if (reducedMotion.matches) { completeTransmission(); return; }
@@ -308,7 +313,7 @@ function openBriefing(review = false) {
 function takeCommand() {
   cancelAnimationFrame(revealFrame);
   setScreen('game');
-  el('mission-title').textContent = 'Lunar operations';
+  el('mission-title').textContent = 'Moon base';
   render();
   el('mission-title').focus();
 }
@@ -375,9 +380,9 @@ function resetPresentation() {
 function commandResult() {
   if (!resolvingShift.action) return outcomeReport();
   return `${ACTIONS[resolvingShift.action].label}: ${resolvingShift.cost} kWh used. ` + ({
-    conserve: 'Life support supplied. Optional systems remained off.',
-    greenhouse: 'One greenhouse light period delivered.',
-    shelter: 'Crew sheltered for this shift only.',
+    conserve: 'Air and heat stayed on. Other systems stayed off.',
+    greenhouse: 'Plants got one shift of light.',
+    shelter: 'Crew stayed in shelter for this shift.',
   }[resolvingShift.action]) + (state.outcome ? ` ${outcomeReport()}` : '');
 }
 
@@ -410,7 +415,7 @@ function openMissionReport() {
   setScreen('report');
   const partial = state.outcome === 'partial-success';
   el('mission-report').dataset.result = partial ? 'partial' : state.crew === 'unsafe' ? 'failure' : 'success';
-  el('outcome-title').textContent = state.outcome === 'full-win' ? 'FULL SUCCESS' : partial ? 'PARTIAL SUCCESS' : 'MISSION FAILED';
+  el('outcome-title').textContent = state.outcome === 'full-win' ? 'MISSION COMPLETE' : partial ? 'CREW SAFE. PLANTS NEED LIGHT.' : 'MISSION FAILED';
   const summary = outcomeReport();
   el('report-readable').textContent = summary;
   el('debrief').textContent = summary;
@@ -423,21 +428,21 @@ function openMissionReport() {
     }
     monitorFrame = requestAnimationFrame(revealReport);
   }
-  el('result-stats').textContent = `${state.crew === 'safe' ? 'Crew safe' : 'Crew unsafe'} / Battery: ${state.battery} kWh / Greenhouse: ${state.lightPeriods}/2 / ${state.log.length} of ${TOTAL_TURNS} shifts completed`;
+  el('result-stats').textContent = `${state.crew === 'safe' ? 'Crew safe' : 'Crew not safe'} / Power left: ${state.battery} kWh / Plant light shifts: ${state.lightPeriods}/2 / ${state.log.length} of ${TOTAL_TURNS} shifts completed`;
   const shelter = state.log.find(entry => entry.turn === state.alertTurn && entry.action === 'shelter');
   const lights = state.log.filter(entry => entry.action === 'greenhouse').map(entry => entry.turn);
-  el('critical-decisions').textContent = `Alert shift ${state.alertTurn}: ${shelter ? 'Shelter selected.' : 'Shelter not completed.'} Greenhouse shifts: ${lights.length ? lights.join(', ') : 'none'}.`;
-  const advice = state.outcome === 'partial-success' ? 'Reserve energy and shifts for two greenhouse light periods.'
-    : state.outcome === 'missed-shelter' ? 'Choose Shelter when the particle alert appears. Earlier shelter does not carry forward.'
-      : state.crew === 'unsafe' ? 'Check the next command’s total cost and keep enough energy for life support and alert-shift shelter.' : '';
-  el('recommendation').textContent = advice;
-  el('recommendation').textContent = advice || `Shelter covered alert shift ${state.alertTurn}, and ${state.lightPeriods} greenhouse light periods were delivered within the battery budget.`;
+  el('critical-decisions').textContent = `Warning on shift ${state.alertTurn}: ${shelter ? 'crew in Shelter.' : 'crew not sheltered.'} Plant lights ran on shifts: ${lights.length ? lights.join(', ') : 'none'}.`;
+  const advice = state.outcome === 'partial-success' ? 'Try again. Save power and time for two Greenhouse shifts.'
+    : state.outcome === 'missed-shelter' ? 'Try again. Choose Shelter when warned. Earlier shelter will not help.'
+      : state.crew === 'unsafe' ? 'Try again. Check each cost. Save power for air, heat and Shelter.' : '';
+  el('recommendation').textContent = advice || 'Keep checking power and warnings with each choice.';
   el('recommendation').hidden = false;
-  el('report-why').textContent = state.outcome === 'missed-shelter' ? `The shift-${state.alertTurn} command did not select Shelter. Protection from earlier shifts does not carry forward.`
-    : state.outcome === 'power-failure' ? `The recorded commands left ${state.battery} kWh before shift ${state.turn}, below the 12 kWh life-support cost.`
-      : state.outcome === 'shelter-power-shortfall' ? `The battery was below the 18 kWh required for alert-shift shelter.`
-        : partial ? `Only ${lights.length} Greenhouse commands were completed. Two were required.`
-          : 'All six shifts completed with safe crew and the greenhouse light goal reached.';
+  el('report-why').textContent = state.outcome === 'missed-shelter' ? `You did not choose Shelter on shift ${state.alertTurn}. Earlier shelter cannot protect a later shift.`
+    : state.outcome === 'power-failure' ? `Your choices left ${state.battery} kWh before shift ${state.turn}. Air and heat need 12 kWh each shift.`
+      : state.outcome === 'shelter-power-shortfall' ? 'There was not enough power for Shelter. It needs 18 kWh.'
+        : partial ? `You chose Greenhouse ${lights.length} times. The plants needed at least two.`
+          : 'You finished six shifts. You used Shelter when warned. Plants got enough light.';
+  el('mission-lesson').textContent = getMissionLesson(state);
   el('report-log').replaceChildren(...[...el('log').children].map(node => node.cloneNode(true)));
   el('report-decisions').open = false;
   el('outcome-title').focus();
@@ -566,5 +571,5 @@ try {
   el('load-status').textContent = '';
   el('start').disabled = false;
 } catch (error) {
-  el('load-status').textContent = `Could not load the mission. Use a local HTTP preview and reload. ${error.message}`;
+  el('load-status').textContent = 'The mission could not load. Check your internet and reload. If it still fails, ask an adult for help.';
 }

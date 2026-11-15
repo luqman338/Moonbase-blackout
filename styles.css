@@ -3,7 +3,7 @@
 * { box-sizing: border-box; }
 body { margin: 0; }main { max-width: 1800px; margin: auto; }h1,h2,h3,p { margin: 0; }h1,h2,h3 { line-height: 1.2; font-weight: 500; }a { color: #d8dfe1; text-underline-offset: 4px; }button { font: inherit; cursor: pointer; min-height: 48px; }button:disabled { cursor: default; }:focus-visible,h2:focus { outline: 3px solid var(--amber); outline-offset: 4px; }[hidden] { display: none !important; }
 .eyebrow,.archive-label,.scene-bottom,.section-heading>span,.action-number,.timeline,.wordmark { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; }.eyebrow { color: var(--muted); margin-bottom: 8px; }.masthead { display: flex; justify-content: space-between; align-items: center; padding: 12px 4%; border-bottom: 1px solid #3a4952; }.wordmark { text-decoration: none; color: #f2eee5; font-size: 12px; }.wordmark>span:last-child,.archive-label { color: var(--muted); }.mission-mark { font-size: 21px; margin-right: 10px; vertical-align: middle; }.separator { margin: 0 12px; color: #9daeb8; }.skip-link { position: absolute; top: -100px; left: 12px; z-index: 10; background: #10171d; padding: 12px; }.skip-link:focus { top: 12px; }
-.scene { position: relative; height: clamp(320px, 41vh, 450px); overflow: hidden; background: #080e18; border-bottom: 1px solid #8a969b; }.scene-art { position: absolute; width: 100%; height: auto; left: 0; bottom: 0; }.scene-caption { position: absolute; left: 4%; top: 22px; max-width: 470px; }.scene-caption h1 { font-size: 24px; letter-spacing: -.03em; }.scene-caption .eyebrow { font-size: 9px; }.scene-caption p { font-size: 13px; color: #d4dee2; max-width: 370px; margin-top: 7px; }body[data-screen="game"] #scene-story { display: none; }
+.scene { position: relative; height: clamp(280px, 23vw, 360px); overflow: hidden; background: #080e18; border-bottom: 1px solid #8a969b; }.scene-art { position: absolute; width: 100%; height: auto; left: 0; bottom: 0; }.scene-caption { position: absolute; left: 4%; top: 22px; max-width: 470px; }.scene-caption h1 { font-size: 24px; letter-spacing: -.03em; }.scene-caption .eyebrow { font-size: 9px; }.scene-caption p { font-size: 13px; color: #d4dee2; max-width: 370px; margin-top: 7px; }body[data-screen="game"] #scene-story { display: none; }
 .scene-bottom { position: absolute; left: 4%; right: 4%; bottom: 12px; display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: #e4e8e7; }.module-label { font: 8px var(--mono); fill: #e9ede3; letter-spacing: .08em; }.terrain-label { font: 8px var(--mono); fill: #cbd5d6; letter-spacing: .08em; }
 .habitat-windows { fill: #eddbac; }.shelter-lamp { fill: #34464d; }.grow-light { stroke: #566f73; }.warning-lamp { fill: #56616a; }.scene.has-light .grow-light { stroke: #edffba; filter: drop-shadow(0 0 8px #e0ff9a); }.scene.has-light .greenhouse-glass { fill: #789566; }.scene.has-growth .crops { fill: #afc38b; }.scene.is-sheltered .shelter-lamp { fill: var(--safe); filter: drop-shadow(0 0 7px #b4d6b9); }.scene.is-conserving .habitat-windows,.scene.low-power .habitat-windows { fill: #a79c78; }.scene.is-alert .warning-lamp { fill: var(--amber); filter: drop-shadow(0 0 8px #f0c27a); }.scene.crew-emergency .warning-lamp { fill: var(--danger); filter: drop-shadow(0 0 8px #ff9e80); }.scene.is-offline .habitat-windows,.scene.is-offline .grow-light,.scene.is-offline .shelter-lamp { fill: #273943; stroke: #273943; filter: none; }.scene.is-offline .greenhouse-glass { fill: #25383e; }
 /* One warm-grey casting carries the shift rail, recessed instrument tray and command bank. */
@@ -40,7 +40,7 @@ body[data-screen="game"] .masthead { display: none; }
 .timeline .current span { background: #20291f; color: #fffde9; box-shadow: inset 0 -3px 0 #fffde9; }
 .timeline .done span { background: #394b33; color: #bce1ac; }
 .timeline .alert-turn span { color: #ffdc91; box-shadow: inset 0 -3px 0 var(--amber); }
-.console-instruments { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 2.3fr) minmax(0, 1fr); border: 2px solid #595e51; background: var(--recess); box-shadow: 0 1px 0 #d3d3bd, inset 0 2px 5px #0008; }
+.console-instruments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 2px solid #595e51; background: var(--recess); box-shadow: 0 1px 0 #d3d3bd, inset 0 2px 5px #0008; }
 .instrument-bay { padding: 16px 18px; min-width: 0; color: var(--instrument-text); }
 .instrument-label { margin: 0 0 8px; color: var(--instrument-muted); font: 10px/1.5 var(--mono); letter-spacing: .06em; }
 .instrument-value { margin: 0 0 6px; font: 24px/1.25 var(--mono); font-variant-numeric: tabular-nums; }
@@ -52,24 +52,36 @@ body[data-screen="game"] .masthead { display: none; }
 .battery-meter.low span { background: repeating-linear-gradient(90deg, #edc079 0 10px, #080c07 10px 13px); }
 .battery-scale { display: flex; justify-content: space-between; gap: 6px; margin: 6px 0 16px; color: var(--instrument-muted); font: 10px/1.5 var(--mono); }
 #battery-percent { color: var(--instrument-text); font-size: 12px; }
-.status-bay { min-width: 0; border-left: 1px solid #555e4f; }
-.status-bay .instrument-bay { padding-top: 12px; padding-bottom: 12px; }
-.crew-bay { border-bottom: 1px solid #555e4f; }
+.crew-bay { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 16px; padding: 8px 18px; border-top: 1px solid #555e4f; }
+.crew-bay .instrument-value { margin: 0; }
 #crew { font-size: 18px; }
 #crew::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; background: #9bd58d; border: 1px solid #bfe1b3; }
 body[data-crew="unsafe"] #crew::before { background: #ff9d8a; border-color: #ffb9a8; }
 .command-deck[data-command="shelter"] #shelter-status, .command-deck[data-command="greenhouse"] #light-status { color: var(--console-green); }
 .command-deck:has(#warning.alert) #shelter-status { color: var(--amber); }
-.light-periods { display: flex; gap: 5px; margin: 8px 0; }
-.light-periods span { width: 22px; height: 6px; border: 1px solid #6b7960; background: #10170d; }
-.light-periods .lit { background: #9bd58d; }
-/* A single black monitor carries immediate warnings, typed results and final outcomes. */
+.light-periods { display: flex; gap: 8px; margin: 10px 0; }
+.light-periods span { display: grid; place-items: center; width: 64px; height: 30px; border: 2px solid #89967f; background: #10170d; color: #d7dfce; font: 14px/1 var(--mono); }
+.light-periods .lit { background: #b6dca4; border-color: #b6dca4; color: #15200e; }
+.light-periods .lit::before { content: "✓"; font-weight: bold; }
+.light-periods .lit { grid-template-columns: auto auto; gap: 4px; }
+/* The active hazard has its own shape and icon above every command. No flashing. */
+.safety-warning { position: sticky; top: 8px; z-index: 5; display: flex; align-items: flex-start; gap: 14px; margin: 0 0 14px; padding: 16px 18px; border: 3px solid #f0bd68; border-left-width: 8px; background: #38240d; color: #ffe4b4; }
+.warning-icon { width: 32px; height: 32px; flex: 0 0 32px; }
+.safety-warning h3 { font: bold 16px/1.3 var(--mono); margin: 0 0 6px; color: #ffd390; }
+.safety-warning #warning { font: 600 20px/1.45 var(--mono); color: #ffe4b4; border: 0; padding: 0; }
+.safety-warning #warning:focus { outline: 3px solid #ffe4b4; outline-offset: 4px; }
+.greenhouse-bay .instrument-label { display: flex; align-items: center; gap: 8px; color: #b6dca4; }
+.plant-icon { width: 22px; height: 22px; flex-shrink: 0; }
+.battery-bay .instrument-label, .greenhouse-bay .instrument-label { font-size: 14px; letter-spacing: 0; }
+#greenhouse { font-size: clamp(28px, 2.5vw, 36px); }
+#plant-status { color: #d5e8cb; font-size: 14px; }
+.operations-monitor:has(#previous-report[hidden]):has(#shift-response[hidden]) { display: none; }
+/* Typed command feedback stays available below the choices. */
 .operations-monitor { min-width: 0; margin: 10px; border: 1px solid var(--console-green-line); background: #030603; color: var(--console-green); font: 13px/1.5 var(--mono); box-shadow: 0 0 0 3px #0a0f08; }
 .monitor-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; padding: 8px 12px; border-bottom: 1px solid var(--console-green-line); color: #80b878; }
 .monitor-header h3, #monitor-phase { font: 9px/1.6 var(--mono); letter-spacing: .04em; }
-.monitor-copy { min-height: 160px; padding: 12px 16px; overflow-wrap: anywhere; }
+.monitor-copy { min-height: 0; padding: 12px 16px; overflow-wrap: anywhere; }
 #warning { font-size: 14px; }
-#warning.alert { color: var(--amber); border-left: 2px solid var(--amber); padding-left: 10px; }
 #warning.failure { color: #ff9d8a; }
 #alert-source { margin-top: 6px; font-size: 10px; color: #c6b993; }
 .monitor-label { margin: 12px 0 4px; color: #80b878; font-size: 9px; letter-spacing: .06em; }
@@ -116,28 +128,24 @@ body[data-crew="unsafe"] #crew::before { background: #ff9d8a; border-color: #ffb
 .scene.is-transitioning[data-command="conserve"] .habitat-windows, .scene.is-transitioning[data-command="greenhouse"] .greenhouse-glass, .scene.is-transitioning[data-command="shelter"] .shelter-lamp { animation: system-response 1s ease-out; }
 @keyframes system-response { from { opacity: .3; } to { opacity: 1; } }
 #load-status:not(:empty), noscript { display: block; padding: 16px 4%; color: var(--amber); }
-/* Resize the existing observation window for the desk. Exterior SVG geometry is unchanged. */
-@media (min-width: 901px) { body[data-screen="game"] .scene { height: clamp(250px, 30svh, 340px); } }
 @media (max-width: 1000px) {
   .command-deck { padding: 12px; }
-  .console-instruments { grid-template-columns: minmax(0, .85fr) minmax(0, 1.8fr) minmax(0, 1fr); }
+  .console-instruments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .instrument-bay { padding: 12px; }
   .operations-monitor { margin: 8px; }
   #actions button { grid-template-columns: 1fr; padding: 10px; }
   .action-name { font-size: 19px; }
 }
 @media (max-width: 900px) {
-  .scene { height: 340px; }
-  .scene-art { width: 125%; left: -12.5%; max-width: none; }
+  /* Keep the artwork proportional; extra height belongs to the sky. */
+  .scene { height: clamp(210px, 36vw, 280px); }
 }
 @media (max-width: 700px) {
   .console-strip { align-items: flex-start; flex-direction: column; gap: 4px; }
   #turn { text-align: left; }
   .console-instruments { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .battery-bay { grid-column: 1; grid-row: 1; }
-  .status-bay { grid-column: 2; grid-row: 1; border-left: 0; }
-  .operations-monitor { grid-column: 1 / -1; grid-row: 2; margin: 8px; }
-  .monitor-copy { min-height: 160px; }
+  .operations-monitor { margin: 10px 0; }
+  .monitor-copy { min-height: 0; }
   #actions { grid-template-columns: 1fr; }
   .command-socket { border-right: 0; border-bottom: 1px solid var(--case-line); }
   .command-socket:last-child { border-bottom: 0; }
@@ -156,7 +164,8 @@ body[data-crew="unsafe"] #crew::before { background: #ff9d8a; border-color: #ffb
   .scene-caption .eyebrow { font-size: 8px; }
   .scene-caption h1 { font-size: 23px; }
   .scene-caption p { font-size: 12px; max-width: 260px; }
-  .scene-art { width: 115%; left: -7.5%; }
+  /* Frame all three crew/plant modules on phones, with no SVG distortion. */
+  .scene-art { width: 164%; left: -24%; }
   .scene-bottom { left: 5%; right: 5%; font-size: 8px; gap: 8px; flex-wrap: wrap; }
   .scene-bottom .separator { margin: 0 4px; }
   .command-deck { margin: 0 8px 12px; padding: 12px 8px 8px; }
@@ -356,4 +365,28 @@ body[data-screen="story"] main { max-width: none; }
   .story-reading { font-size: 15px; }
   #story-toc ol { grid-template-columns: 1fr; }
   .story-reading th, .story-reading td { padding: 6px; font-size: 12px; }
+}
+
+/* Decision hierarchy on narrow screens: warning, readings, commands, then context. */
+body[data-screen="game"] .scene-caption { top: 10px; }
+.console-strip { margin-bottom: 8px; }
+.timeline { margin: 12px 0 0; }
+.timeline li { padding-block: 4px; }
+@media (max-width: 600px) {
+  .safety-warning { gap: 10px; padding: 12px; margin-bottom: 10px; }
+  .warning-icon { width: 26px; height: 26px; flex-basis: 26px; }
+  .safety-warning #warning { font-size: 17px; line-height: 1.4; }
+  .battery-bay, .greenhouse-bay { padding: 12px 10px; }
+  .battery-bay .instrument-label, .greenhouse-bay .instrument-label { font-size: 13px; }
+  #battery { font-size: 28px; margin: 10px 0 12px; }
+  #greenhouse { font-size: 28px; }
+  #plant-status { font-size: 12px; }
+  .light-periods { gap: 6px; }
+  .light-periods span { width: 48px; height: 26px; }
+  .crew-bay { padding: 8px 10px; }
+  .console-strip { flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .timeline small { display: none; }
+  .command-socket { padding: 8px; }
+  #actions button { min-height: 64px; padding: 8px 12px; }
+  #actions p { margin-top: 5px; }
 }
