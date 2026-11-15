@@ -1,6 +1,8 @@
 /** DOM adapter: archive provenance, terminal screens and a phase-driven command console. */
 import { ACTIONS, TOTAL_TURNS, createGame, retry, chooseAction, getWarning, getDebrief } from './game.mjs';
 
+import { storySections, projectLinks, editorial } from './mission-story.mjs';
+
 const el = (id) => document.getElementById(id);
 const buttons = [...document.querySelectorAll('[data-action]')];
 let events;
@@ -202,6 +204,7 @@ function render() {
         : `${state.battery - cost} kWh after selection`;
   }
   el('review-briefing').disabled = phase === 'resolving';
+  el('story-game').disabled = phase === 'resolving';
   renderScene();
   el('timeline').replaceChildren(...Array.from({ length: TOTAL_TURNS }, (_, index) => {
     const turn = index + 1;
@@ -247,12 +250,13 @@ let lastNextTime = -Infinity;
 
 function setScreen(screen) {
   document.body.dataset.screen = screen;
+  el('mission-story').hidden = screen !== 'story';
   el('mission-report').hidden = screen !== 'report';
   el('launch').hidden = screen !== 'launch';
   el('briefing').hidden = screen !== 'briefing';
   el('command').hidden = screen !== 'game';
   el('mission').hidden = screen !== 'game';
-  for (const id of ['masthead', 'scene', 'source-footer']) el(id).hidden = screen !== 'game';
+  for (const id of ['masthead', 'scene']) el(id).hidden = screen !== 'game';
   document.querySelector('.skip-link').hidden = screen !== 'game';
 }
 
@@ -435,10 +439,7 @@ function openMissionReport() {
         : partial ? `Only ${lights.length} Greenhouse commands were completed. Two were required.`
           : 'All six shifts completed with safe crew and the greenhouse light goal reached.';
   el('report-log').replaceChildren(...[...el('log').children].map(node => node.cloneNode(true)));
-  el('report-source-copy').replaceChildren(...[...el('source-footer').children].filter(node => node.tagName !== 'SUMMARY').map(node => node.cloneNode(true)));
-  el('report-source-copy').querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
   el('report-decisions').open = false;
-  el('report-sources').open = false;
   el('outcome-title').focus();
   window.scrollTo(0, 0);
 }
@@ -481,6 +482,79 @@ for (const button of buttons) {
 }
 reducedMotion.addEventListener('change', () => {
   if (reducedMotion.matches) { completeMonitorMessage(); skipAnimation(); }
+});
+
+// Documentation is a view over static content. It never calls a simulation transition.
+let storyReturn = null;
+for (const [key, label] of [['demo', 'Live demo'], ['repository', 'Code repository'], ['challenge', 'Official challenge']]) {
+  const link = document.createElement('a');
+  link.href = projectLinks[key];
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = label;
+  el('story-links').append(link);
+}
+const contents = document.createElement('ol');
+for (const [index, section] of storySections.entries()) {
+  const article = document.createElement('section');
+  article.id = `story-${section.id}`;
+  const heading = document.createElement('h3');
+  heading.textContent = `${String(index + 1).padStart(2, '0')} / ${section.title}`;
+  article.append(heading);
+  const body = document.createElement('div');
+  // Trusted, locally authored markup only. NASA fields and editable credit text use textContent.
+  body.innerHTML = section.body;
+  article.append(body);
+  el('story-sections').append(article);
+  const item = document.createElement('li');
+  const link = document.createElement('a');
+  link.href = `#${article.id}`;
+  link.textContent = section.title;
+  link.addEventListener('click', event => {
+    event.preventDefault();
+    article.scrollIntoView({ block: 'start' });
+  });
+  item.append(link); contents.append(item);
+}
+el('story-toc').append(contents);
+// Preserve the complete existing archive explanation alongside the expanded science section.
+el('story-science').append(el('source-footer'));
+for (const entry of [
+  ...(editorial.projectLead ? [{ name: editorial.projectLead, contribution: editorial.projectLeadContribution || 'Project Lead' }] : []),
+  ...editorial.members,
+]) {
+  const p = document.createElement('p');
+  p.textContent = `${entry.name}: ${entry.contribution}`;
+  el('story-credits').append(p);
+}
+for (const observation of editorial.playtesting) {
+  const p = document.createElement('p');
+  p.textContent = observation;
+  el('story-validation').append(p);
+}
+for (const credit of editorial.mediaCredits) {
+  const p = document.createElement('p'); p.textContent = credit;
+  el('story-credits').append(p);
+}
+for (const id of ['story-launch', 'story-game', 'story-report']) {
+  el(id).addEventListener('click', () => {
+    if (resolvingShift || document.body.dataset.screen === 'story') return;
+    completeMonitorMessage();
+    storyReturn = { screen: document.body.dataset.screen, scroll: window.scrollY, trigger: el(id) };
+    el('story-back').textContent = storyReturn.screen === 'report' ? 'Back to Report' : storyReturn.screen === 'launch' ? 'Back to Launch' : 'Back to Mission';
+    setScreen('story');
+    document.querySelector('.story-scroll').scrollTop = 0;
+    window.scrollTo(0, 0);
+    el('story-title').focus();
+  });
+}
+el('story-back').addEventListener('click', () => {
+  if (!storyReturn) return;
+  const saved = storyReturn;
+  storyReturn = null;
+  setScreen(saved.screen);
+  window.scrollTo(0, saved.scroll);
+  saved.trigger.focus({ preventScroll: true });
 });
 
 // Relative data paths work in a local preview and below a repository URL prefix.

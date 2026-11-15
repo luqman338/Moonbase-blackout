@@ -10,7 +10,7 @@ From this repository, run:
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Open <http://127.0.0.1:8000/>. Use HTTP rather than opening `index.html` as a file so the browser can load local JSON. All application asset paths are relative and support a GitHub Pages repository prefix. Nothing has been deployed.
+Open <http://127.0.0.1:8000/>. Use HTTP rather than opening `index.html` as a file so the browser can load local JSON. All application asset paths are relative and support a GitHub Pages repository prefix. A public copy is available at https://luqman338.github.io/Moonbase-blackout/. It may lag local changes. This documentation milestone does not deploy changes.
 
 ## Files
 
@@ -55,3 +55,15 @@ Manual browser check: Take Command, choose Conserve twice, confirm the particle 
 ## AI assistance
 
 OpenAI Codex generated the initial implementation, tests, and documentation from the user's specification and retrieved the SEP archive record. Automated tests check game behavior. A human review and playtest are still useful before classroom use.
+
+## Behind the Mission
+
+The launch screen, command desk and report open the same terminal project story. Back returns to the originating screen without restarting or re-rendering the mission.
+
+Edit narrative content, source links and private editorial fields in `mission-story.mjs`. Leave unknown fields empty: they do not appear in the UI. Confirm the project lead's public name, each registered member's name and specific contribution, and any media source/permission before adding credits. No external media files or audio are bundled now.
+
+Sunday playtesting entries belong in `editorial.playtesting`. Record the task, age range, observed difficulty, change and retest without identifying children. Do not describe technical browser checks as child usability or learning evidence.
+
+The original Verification paragraph above records the initial implementation session. Subsequent development included browser verification of all four outcomes, presentation phases, manual advancement, Retry cancellation, reduced motion, particle timing and 1440/390/320 layouts. The current documentation pass also checks launch/gameplay/report navigation to the shared story and back. These checks do not establish educational effectiveness.
+
+Scientific caveat: the SEP object is retrieved NASA data; the flare beginTime remains a supplied specification fact whose independent retrieval was not completed. Early research and qualitative prototype assessments in the story come from the project lead's notes. Commit IDs document implementation checkpoints, not independent proof of that research or learner impact.

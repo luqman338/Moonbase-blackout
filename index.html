@@ -21,6 +21,7 @@
             <h1 id="launch-title">Moonbase Blackout</h1>
             <p class="launch-provenance">Fictional mission.<br>Based on archived observations.</p>
             <button id="start" class="terminal-button launch-button" disabled><span aria-hidden="true">&gt;</span> Begin Mission<span class="terminal-cursor" aria-hidden="true"></span></button>
+            <button id="story-launch" class="terminal-button story-launch-link">Behind the Mission</button>
             <p id="load-status" role="status">Loading mission data…</p>
             <noscript>This game needs JavaScript enabled.</noscript>
           </div>
@@ -137,9 +138,29 @@
               <h3 class="report-section-label">WHAT HAPPENED</h3><p id="report-readable" class="sr-only" role="status"></p><p id="debrief" aria-hidden="true"></p><h3 class="report-section-label">WHY IT HAPPENED</h3><p id="report-why"></p><p id="critical-decisions"></p><h3 class="report-section-label">WHAT TO DO NEXT TIME</h3><p id="recommendation"></p>
             </section>
             <details id="report-decisions"><summary>Review Decisions</summary><ol id="report-log"></ol></details>
-            <details id="report-sources"><summary>Access Mission Sources</summary><div id="report-source-copy"></div></details>
+            <button id="story-report" class="terminal-button">Behind the Mission</button>
           </div>
           <footer class="transmission-controls"><button id="report-retry" class="terminal-button">Retry Mission</button></footer>
+        </div>
+      </div>
+    </section>
+
+    <!-- One project story, shared by launch, gameplay and report. Returning never resets a mission. -->
+    <section id="mission-story" class="terminal-screen" hidden aria-labelledby="story-title">
+      <div class="terminal-housing">
+        <header class="station-plate"><span>OUTPOST 01 / PROJECT RECORD</span><span>MOONBASE BLACKOUT</span></header>
+        <div class="terminal-monitor story-monitor">
+          <header class="story-toolbar"><h2 id="story-title" tabindex="-1">Behind the Mission</h2><button id="story-back" class="terminal-button">Back to Mission</button></header>
+          <div class="story-scroll" tabindex="0" role="region" aria-label="Project story">
+            <div class="story-reading">
+              <p class="story-intro">Run a lunar outpost on one battery for six shifts.</p>
+              <p>Read the project story, explore the science, or check the rules and evidence.</p>
+              <nav id="story-links" class="story-links" aria-label="Project links"></nav>
+              <nav id="story-toc" aria-label="Story sections"></nav>
+              <div id="story-sections"></div>
+              <details id="source-footer" class="story-provenance"><summary>Stored observation and provenance</summary><p>Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. The animated particles are an educational schematic, not literally visible radiation or a measured lunar particle environment. NASA DONKI records are archived spacecraft observations, not predictions of lunar radiation dose. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -203,7 +224,7 @@
         </section>
         <div class="console-utilities">
           <details class="mission-log"><summary>Decision log <span id="log-count">0 / 6</span></summary><ol id="log"></ol></details>
-          <details id="source-footer" class="source-records" hidden><summary>Archive & assumptions</summary><p>Fictional mission. Real archived observations. <a href="https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1">NASA CCMC DONKI archive ↗</a></p><p id="source-observation"></p><p id="timing"></p><p id="flare-source"></p><p>The blackout, clock offset, 92 kWh battery, energy costs, light periods and one-turn shelter protection are fictional game assumptions. The animated particles are an educational schematic, not literally visible radiation or a measured lunar particle environment. NASA DONKI records are archived spacecraft observations, not predictions of lunar radiation dose. These archived observations are not a lunar radiation forecast. No live forecast is used.</p></details>
+          <button id="story-game" class="utility-key">Behind the Mission</button>
           <button id="review-briefing" class="utility-key">Mission Briefing</button><button id="retry" class="utility-key">Retry mission</button>
         </div>
       </section>
