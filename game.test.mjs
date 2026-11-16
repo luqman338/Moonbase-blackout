@@ -26,6 +26,22 @@ test('C C G: missed shelter spends nothing and logs no failed action', () => {
   assert.equal(s.log.length, 2);
   assert.equal(s.crew, 'unsafe');
 });
+test('Both non-Shelter warning choices leave 68 kWh and two completed shifts', () => {
+  for (const choice of ['C', 'G']) {
+    const s = play(`C C ${choice}`);
+    assert.equal(s.outcome, 'missed-shelter');
+    assert.equal(s.battery, 68);
+    assert.equal(s.crew, 'unsafe');
+    assert.equal(s.log.length, 2);
+  }
+});
+test('Greenhouse counts and history remain accurate beyond the two-shift goal', () => {
+  const s = play('G G S G G');
+  assert.equal(s.lightPeriods, 4);
+  assert.equal(s.log.filter(entry => entry.action === 'greenhouse').length, 4);
+  assert.equal(s.battery, 2);
+  assert.equal(s.outcome, 'power-failure');
+});
 test('C C S C C C: partial success, 14 kWh', () => {
   const s = play('C C S C C C');
   assert.equal(s.outcome, 'partial-success');

@@ -58,6 +58,9 @@ body[data-screen="game"] .masthead { display: none; }
 .crew-bay .instrument-value { margin: 0; }
 #crew { font-size: 18px; }
 #crew::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; background: #9bd58d; border: 1px solid #bfe1b3; }
+body[data-crew="danger"] #crew { color: var(--amber); }
+body[data-crew="danger"] #crew::before { background: var(--amber); border-color: var(--amber); }
+body[data-crew="unsafe"] #crew { color: var(--danger); }
 body[data-crew="unsafe"] #crew::before { background: #ff9d8a; border-color: #ffb9a8; }
 .command-deck[data-command="shelter"] #shelter-status, .command-deck[data-command="greenhouse"] #light-status { color: var(--console-green); }
 .command-deck:has(#warning.alert) #shelter-status { color: var(--amber); }
