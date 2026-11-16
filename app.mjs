@@ -1,4 +1,6 @@
 /** DOM adapter: archive provenance, terminal screens and a phase-driven command console. */
+// AI-assisted development: OpenAI Codex contributed implementation and debugging.
+// Project roles and human direction/review: README.md, People and AI assistance.
 import { ACTIONS, TOTAL_TURNS, createGame, retry, chooseAction, getWarning, getDebrief, getMissionLesson } from './game.mjs';
 
 import { storySections, projectLinks, editorial } from './mission-story.mjs';

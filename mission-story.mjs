@@ -1,4 +1,6 @@
 /** Editable project story. Narrative follows project-lead notes; technical facts follow code and archive provenance. */
+// AI-assisted development: OpenAI Codex contributed code and documentation.
+// Project roles and human direction/review: README.md, People and AI assistance.
 // Editorial fields stay out of the public UI until filled. Add consented, factual observations only.
 export const editorial = {
   projectLead: 'Luqman',
@@ -28,7 +30,7 @@ export const storySections = [
     <p>Before building, Luqman reviewed NASA resources, earlier Space Apps projects, educational games and interface ideas. He turned that research into a short set of requirements: choices children could understand, visible consequences and results that could be checked.</p>
     <p>The deadline forced a useful decision. Adding water, oxygen and heat would mean more rules, more testing and more readings for younger players to understand. One battery, six shifts and three commands left time to make the small model clear and reliable.</p>
     <p>The rules use fixed costs. The same choices always produce the same result. That made it possible to check a plan by hand, then use automated tests to catch mistakes in the software.</p>
-    <p>Luqman directed the design and reviewed the prototypes. Codex implemented the simulation and much of the interface, tests and documentation. Farhan provided technical advice and code review. After interface changes, the rules could be checked again without depending on how the game looked.</p>` },
+    <p>Luqman directed the design and reviewed the prototypes. Codex implemented the simulation and contributed to the interface, tests and documentation. Farhan provided technical advice and code review. After interface changes, the rules could be checked again without depending on how the game looked.</p>` },
   { id: 'feedback', title: 'The feedback changed the priorities', body: `
     <p>The first prototype followed its rules, but children in Luqman’s community program described it as “boring.” The calculations worked. Presentation and feedback became the next design problem.</p>
     <p>That feedback shifted the work toward showing what each command did. A unified, physical-looking console replaced separate webpage-style panels. Greenhouse lights and shelter indicators made the selected system visible.</p>
@@ -54,7 +56,7 @@ export const storySections = [
   { id: 'credits', title: 'People, tools and project information', body: `
     <p>Luqman is Project Lead, responsible for research, game design, UI/UX direction, feedback collection, testing and iteration. Farhan, his father, is Advisor and Code Reviewer, with a supporting role in technical advice and checking code.</p>
     <h4 id="story-tools">Tools and AI assistance</h4>
-    <p>ChatGPT helped with brainstorming, research assistance, planning, prompts and review. Codex generated the initial implementation, tests and documentation, and made substantial later code, styling, testing and debugging contributions, including this story revision. AI was part of implementation, not only editing.</p>
+    <p>ChatGPT helped with brainstorming, research assistance, planning, prompts and review. Codex generated the initial implementation, tests and documentation, and made later code, styling, testing and debugging contributions, including this story revision. AI was part of implementation, not only editing.</p>
     <p>Luqman chose the problem, learning goals and model limits, directed the interface and story, reviewed results and set revision priorities. These contributions do not mean he independently hand-coded every component.</p>
     <p>The project uses plain HTML, CSS and JavaScript ES modules, with no framework, backend, dependencies or build step. Rules live in <code>game.mjs</code>; rendering and input live in <code>app.mjs</code>. Tools include VS Code, Git, GitHub and Node.js. The game is hosted on GitHub Pages.</p>
     <h4>Sources and artwork</h4>

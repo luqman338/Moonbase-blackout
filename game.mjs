@@ -1,4 +1,6 @@
 /** Pure six-turn simulation. No DOM, network, clock, or mutable global state. */
+// AI-assisted development: OpenAI Codex contributed implementation.
+// Project roles and human direction/review: README.md, People and AI assistance.
 export const ACTIONS = Object.freeze({
   conserve: Object.freeze({ label: 'Conserve', cost: 12 }),
   greenhouse: Object.freeze({ label: 'Greenhouse', cost: 18 }),

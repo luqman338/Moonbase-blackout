@@ -63,7 +63,7 @@ Less than 12 kWh before a shift ends in power failure. On the alert shift, less 
 
 Luqman led the concept, research, requirements, educational design, engineering trade-offs, gameplay, UI/UX, feedback collection, testing and iteration. Feedback from children in his community STEM, business and leadership program informed pacing, storytelling and interaction changes. No measured learning gains are claimed or child identities published.
 
-Farhan, Luqman's father, supported the project as Advisor and Code Reviewer. ChatGPT assisted research, brainstorming, planning and review. Codex substantially assisted implementation, tests, documentation and debugging. The code is not presented as independently hand-written by Luqman.
+Farhan, Luqman's father, supported the project as Advisor and Code Reviewer. ChatGPT assisted research, brainstorming, planning, prompts and review. Codex assisted coding, tests, styling, debugging and documentation. Luqman directed the project, design and decisions, and performed testing and review. The code is not presented as independently hand-written by Luqman.
 
 ## Privacy and licensing
 

@@ -1,4 +1,6 @@
 /** Outcome lessons must follow real game results and leave the state untouched. */
+// AI-assisted development: OpenAI Codex contributed these tests.
+// Project roles and human direction/review: README.md, People and AI assistance.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';

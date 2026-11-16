@@ -1,6 +1,7 @@
 {
   "provenance": {
     "description": "Curated archived NASA CCMC DONKI observations, not lunar radiation forecasts. Wrapper fields are local metadata; sep preserves the matching API object unchanged.",
+    "aiAssistance": "ChatGPT assisted research, planning, prompts and review. Codex assisted local provenance documentation and wrapper preparation. This disclosure applies to local curation only. The original NASA SEP observations are unchanged and are not AI-generated.",
     "retrievedOn": "2026-11-14",
     "sepSourceUrl": "https://api.nasa.gov/DONKI/SEP?startDate=2024-05-11&endDate=2024-05-11&api_key=DEMO_KEY",
     "sepRecordUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/30717/-1",
